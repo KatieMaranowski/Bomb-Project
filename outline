@@ -8,8 +8,6 @@ TOGGLES TO GET TO KEYPAD: 0011
 TOGGLES TO GET TO BUTTON: 0110
 TOGGLES TO GET TO WIRES: 1001
 
-BUTTON:
-The virus on the screen has a game where you have to press the button faster than him (best out of 3) otherwise he resets the toggles
 
 WIRES:
 The virus gives you confusing instructions to defuse but really you just need to pull them all out
