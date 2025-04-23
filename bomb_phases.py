@@ -141,6 +141,8 @@ class PhaseThread(Thread):
         self._value = None
         # phase threads are either running or not
         self._running = False
+        
+        self._active = False
 
 # the timer phase
 class Timer(PhaseThread):
@@ -160,6 +162,9 @@ class Timer(PhaseThread):
     def run(self):
         self._running = True
         while (self._running):
+            if not self._active:
+                sleep(0.1)
+                continue
             if (not self._paused):
                 # update the timer and display its value on the 7-segment display
                 self._update()
@@ -200,6 +205,9 @@ class Keypad(PhaseThread):
     def run(self):
         self._running = True
         while (self._running):
+            if not self._active:
+                sleep(0.1)
+                continue
             # process keys when keypad key(s) are pressed
             if (self._component.pressed_keys):
                 # debounce
@@ -234,7 +242,11 @@ class Wires(PhaseThread):
 
     # runs the thread
     def run(self):
-        # TODO
+        self._running = True
+        while (self._running):
+            if not self._active:
+                sleep(0.1)
+                continue
         pass
 
     # returns the jumper wires state as a string
@@ -268,6 +280,9 @@ class Button(PhaseThread):
         self._rgb[1].value = False if self._color == "G" else True
         self._rgb[2].value = False if self._color == "B" else True
         while (self._running):
+            if not self._active:
+                sleep(0.1)
+                continue
             # get the pushbutton's state
             self._value = self._component.value
             # it is pressed
@@ -298,18 +313,30 @@ class Button(PhaseThread):
 
 # the toggle switches phase
 class Toggles(PhaseThread):
-    def __init__(self, component, target, name="Toggles"):
+    from bomb_configs import toggle_patterns
+    def __init__(self, component, target, phase_map, name="Toggles"):
         super().__init__(name, component, target)
+        self._phase_map = phase_map
 
     # runs the thread
     def run(self):
-        # TODO
-        pass
+        self._running = True
+        while self._running:
+            toggled = "".join(str(int(p.value)) for p in self._component)
+            
+            for name, pattern in toggle_patterns.items():
+                phase = self._phase_map[name]
+                active = (bits == pattern)
+                if active and not phase._active:
+                    phase.reset()
+                phase._active = activeOrOff
+                
+            self._value = bits
+            sleep(0.05)
+            
 
     # returns the toggle switches state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
-        else:
-            # TODO
-            pass
+        return self._value if self._value is not None else "----"
