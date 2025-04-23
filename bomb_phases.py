@@ -321,23 +321,17 @@ class Toggles(PhaseThread):
     # runs the thread
     def run(self):
         self._running = True
-        phase_map = {
-            "keypad" : keypad,
-            "wires" : wires,
-            "button" : button
-            }
-        
         while self._running:
             toggled = "".join(str(int(p.value)) for p in self._component)
             
             for phase_name, pattern in toggle_patterns.items():
-                phase = self._phase_map[phase_name]
-                activeOrOff = (toggled == pattern)
-                if activeOrOff and not phase._active:
+                phase = self._phase_map[name]
+                active = (bits == pattern)
+                if active and not phase._active:
                     phase.reset()
                 phase._active = activeOrOff
                 
-            self._value = toggled
+            self._value = bits
             sleep(0.05)
             
 
