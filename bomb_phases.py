@@ -314,13 +314,13 @@ class Button(PhaseThread):
 # the toggle switches phase
 class Toggles(PhaseThread):
     from bomb_configs import toggle_patterns
-    def __init__(self, component, target, name="Toggles"):
+    def __init__(self, component, target, phase_map name="Toggles"):
         super().__init__(name, component, target)
+        self._phase_map = phase_map
 
     # runs the thread
     def run(self):
         self._running = True
-        global keypad, wires, button
         phase_map = {
             "keypad" : keypad,
             "wires" : wires,

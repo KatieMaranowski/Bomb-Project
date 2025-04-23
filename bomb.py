@@ -173,6 +173,13 @@ def turn_off():
     for pin in button._rgb:
         pin.value = True
 
+phase_map = {
+    "Keypad": keypad,
+    "Wires" : wires,
+    "Button": button,
+}
+toggles = Toggles(component_toggles, toggles_target, phase_map)
+
 ######
 # MAIN
 ######
