@@ -174,9 +174,9 @@ def turn_off():
         pin.value = True
 
 phase_map = {
-    "Keypad": keypad,
-    "Wires" : wires,
-    "Button": button,
+    "Keypad": Keypad,
+    "Wires" : Wires,
+    "Button": Button,
 }
 toggles = Toggles(component_toggles, toggles_target, phase_map)
 
