@@ -313,6 +313,7 @@ class Button(PhaseThread):
 
 # the toggle switches phase
 class Toggles(PhaseThread):
+    from bomb_configs import toggle_patterns
     def __init__(self, component, target, name="Toggles"):
         super().__init__(name, component, target)
 
@@ -330,7 +331,7 @@ class Toggles(PhaseThread):
             toggled = "".join(str(int(p.value)) for p in self._component)
             
             for phase_name, pattern in toggle_patterns.items():
-                phase = phase_map[phase_name]
+                phase = self._phase_map[phase_name]
                 activeOrOff = (toggled == pattern)
                 if activeOrOff and not phase._active:
                     phase.reset()
