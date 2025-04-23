@@ -324,7 +324,7 @@ class Toggles(PhaseThread):
         while self._running:
             toggled = "".join(str(int(p.value)) for p in self._component)
             
-            for phase_name, pattern in toggle_patterns.items():
+            for name, pattern in toggle_patterns.items():
                 phase = self._phase_map[name]
                 active = (bits == pattern)
                 if active and not phase._active:
@@ -339,6 +339,4 @@ class Toggles(PhaseThread):
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
-        else:
-            # TODO
-            pass
+        return self._value if self._value is not None else "----"
