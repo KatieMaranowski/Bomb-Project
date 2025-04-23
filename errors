@@ -1,0 +1,21 @@
+Exception in thread TogglesException in Tkinter callback:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb_phases.py", line 325, in run
+    "keypad" : keypad,
+               ^^^^^Traceback (most recent call last):
+^  File "/usr/lib/python3.11/tkinter/__init__.py", line 1948, in __call__
+    return self.func(*args)
+           ^^^^^^^^^^^^^^^^
+
+  File "/usr/lib/python3.11/tkinter/__init__.py", line 861, in callit
+    func(*args)
+NameError  File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 27, in bootup
+    check_phases()
+:   File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 121, in check_phases
+    gui._ltoggles["text"] = f"Toggles: {toggles}"
+                            ^^^^^^^^^^^^^^^^^^^^^
+name 'keypad' is not definedTypeError: __str__ returned non-string (type NoneType)
+. Did you mean: 'Keypad'?
