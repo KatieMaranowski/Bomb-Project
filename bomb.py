@@ -52,9 +52,9 @@ def setup_phases():
     gui.setButton(button)
     # setup the toggle switches thread
     phase_map = {
-        "Keypad": Keypad,
-        "Wires" : Wires,
-        "Button": Button,
+        "Keypad": keypad,
+        "Wires" : wires,
+        "Button": button,
     }
     
     toggles = Toggles(component_toggles, toggles_target, phase_map)    
