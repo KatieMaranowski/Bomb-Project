@@ -208,7 +208,7 @@ class Keypad(PhaseThread):
         self._value = ""
         self._current_index = 0
         self._defused = False
-        self.failed = False
+        self._failed = False
         
 
     # runs the thread
@@ -230,11 +230,11 @@ class Keypad(PhaseThread):
                     sleep(0.1)
                 # log the key
                 self._value += str(key)
-                code = self._code[self._current_index]
+                code = self._codes[self._current_index]
                 
                 if self._value == code and self._current_index == len(self._codes) - 1:
                     self._defused = True
-                    self._running = False
+                    #self._running = False
                     break
                 if self._value == code:
                     self._current_index += 1
@@ -242,7 +242,7 @@ class Keypad(PhaseThread):
                 elif not code.startswith(self._value):
                     self._failed = True
                     
-            sleeps(0.1)
+            sleep(0.1)
                 
 
     # returns the keypad combination as a string
@@ -258,6 +258,12 @@ class Keypad(PhaseThread):
 class Wires(PhaseThread):
     def __init__(self, component, target, name="Wires"):
         super().__init__(name, component, target)
+        
+    def reset(self):
+        self._value = ""
+        self._current_index = 0
+        self._defused = False
+        self._failed = False
 
     # runs the thread
     def run(self):
@@ -290,6 +296,12 @@ class Button(PhaseThread):
         self._color = color
         # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
         self._timer = timer
+        
+    def reset(self):
+        self._value = ""
+        self._current_index = 0
+        self._defused = False
+        self._failed = False
 
     # runs the thread
     def run(self):
