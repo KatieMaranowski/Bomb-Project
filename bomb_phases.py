@@ -205,10 +205,10 @@ class Keypad(PhaseThread):
         self._current_index = 0
         
     def reset(self):
-    self._value = ""
-    self._current_index = 0
-    self._defused = False
-    self.failed = False
+        self._value = ""
+        self._current_index = 0
+        self._defused = False
+        self.failed = False
         
 
     # runs the thread
