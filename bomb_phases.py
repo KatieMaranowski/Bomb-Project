@@ -231,8 +231,8 @@ class Keypad(PhaseThread):
                         self.defused = True
                     else:
                         self._value = ""
-                    elif not current_code.startswith(self._value):
-                        self_failed = True
+                elif not current_code.startswith(self._value):
+                    self_failed = True
                 sleep(0.1)
 
     # returns the keypad combination as a string
