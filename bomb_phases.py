@@ -256,17 +256,91 @@ class Keypad(PhaseThread):
 
         return f"{self._value} (Code {attempt}/{total})"
 
-# the jumper wires phase
+#jumper wires phase
 class Wires(PhaseThread):
-    def __init__(self, component, target, name="Wires"):
-        super().__init__(name, component, target)
+    def __init__(self, color, connected, name="Wires"):  #add pins
+        self.color = color
+        self.connected = connected
+        self.cut = False
+        self.instructions = []
         
+    def get_instructions(self):
+        #virus will give confusing set of instructions
+        self.insturctions = [
+            f"Cut the {self.color} wire if it is connected to Phase 1.",
+            f"DO NOT cut the {self.color} wire if it's connected to Phase 3.",
+            f"Cut the {self.color} wire if it's even numbered.",
+            f"DO NOT cut the {self.color} wire if it's connected to the red switch."
+            ]
+        
+        #returning random instruction
+        return random.choice(self.instructions)
+    
+    #resetting toggles   
     def reset(self):
         self._value = ""
         self._current_index = 0
         self._defused = False
         self._failed = False
+        
+        
+#creating virus
+class Virus:
+    def __init__(self, wires):
+        self.wires = wires #list of wire objects
+        self.active = False #virus flag
+  
+    #activating wires
+    def activate(self):
+        self.active = True
+        self.infect_wires()
+     
+    #making the wires have a virus
+    def _infect_wires(self):
+        """Apply virus effect and give confusing instructions to the wires."""
+        for wire in self.wires:
+            instruction = wire.get_instrctions()
+            print(f"Virus: {instruction}")
+            
+    def check_for_defuse(self):
+        """Check if all wires have been cut and the virus is answered."""
+        if all(wire.cut for wire in self.wires):
+            print("All wires cut. The virus is removed from the screen.")
+            self.active = False   #virus is removed
+        else:
+            print("The virus is still active. Wires need to be cut.")
+            
+    
+    #getting confusing information to remove the wires
+    def get_confusing_instructions(self):
+        """Return the confusing instructions for the wires."""
+        return [wire.get_instructions() for wire in self.wires]
+    
+    
+#example setup
+wires = [
+    Wire(color="red", connected=True),
+    Wire(color="blue", connected=True),
+    Wire(color="green", connected=True)
+    ]
 
+virus = Virus(wires)
+
+#activate virus to confuse player
+virus.activate()
+
+#player interacting with wires cutting them
+wires[0].cut_wire()
+wires[1].cut_wire()
+wires[2].cut_wire()
+
+#check if wires have been cut to remove virus
+virus.check_for_defuse()
+            
+        
+        
+        
+'''        
     # runs the thread
     def run(self):
         self._running = True
@@ -283,6 +357,7 @@ class Wires(PhaseThread):
         else:
             # TODO
             pass
+'''
 
 #pushbutton phase
 class Button(PhaseThread):
