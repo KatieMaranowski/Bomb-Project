@@ -325,6 +325,12 @@ class Toggles(PhaseThread):
     def __init__(self, component, target, phase_map, name="Toggles"):
         super().__init__(name, component, target)
         self._phase_map = phase_map
+        
+    def reset(self):
+        self._value = ""
+        self._current_index = 0
+        self._defused = False
+        self.failed = False
 
     # runs the thread
     def run(self):
@@ -334,12 +340,12 @@ class Toggles(PhaseThread):
             
             for name, pattern in toggle_patterns.items():
                 phase = self._phase_map[name]
-                active = (bits == pattern)
+                active = (toggled == pattern)
                 if active and not phase._active:
                     phase.reset()
-                phase._active = activeOrOff
+                phase._active = active
                 
-            self._value = bits
+            self._value = toggled
             sleep(0.05)
             
 
