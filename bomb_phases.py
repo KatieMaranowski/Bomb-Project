@@ -41,27 +41,37 @@ class Lcd(Frame):
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
         # the scrolling informative "boot" text
-        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
+        self._lscroll = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
         self.pack(fill=BOTH, expand=True)
 
     # sets up the LCD GUI
     def setup(self):
+        global keypad_count
+        
+        self.textbox = Text(window,  width = 30, height = 10,fg = '#00008B', bg = '#FFFFFF', font = font_example, wrap=WORD)
+        textboxtext = "{}".format(text)
+        self.textbox.insert(END, textboxtext)
+        self.viruscharacter = PhotoImage(file="viruscharacter.gif")
+        self.viruscharacter2 = Label(window, image=self.viruscharacter, bg='#D3D3D3')
+        
         # the timer
-        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
+        self._ltimer = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Time left: ")
         self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
         # the keypad passphrase
-        self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
+        self._lkeypad = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Keypad: 0/3")
         self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
         # the jumper wires status
-        self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
+        self._lwires = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Wires: ")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
         # the pushbutton status
-        self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
+        self._lbutton = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Button: ")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
         # the toggle switches status
-        self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
+        self._ltoggles = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 18), text="Toggles: ")
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
+        self.viruscharacter2.grid(row=6,column=0, padx = 0, pady = 350)
+        
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
         self._lstrikes.grid(row=5, column=2, sticky=W)

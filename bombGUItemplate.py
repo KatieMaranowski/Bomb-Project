@@ -6,8 +6,14 @@ keypad_count = 0 # This will show as 0-3 because you have to complete three diff
 button_status = 0 #0 means button phase not complete, 1 means button phase complete
 wires_status = 0 # 0 means wire not complete, 1 means wire complete
 font_example = ("Arial", 16, "bold")
+
+def evil_messages(keypad_count):
+  messages = ["Nothing can stop me now","THIS ISN'T EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh","Didn't anyone ever teach you internet safety?"]
+  sleep(2)
+  text = random.choice(messages)
+
 if keypad_count == 0:
-    text = "Generic evil message"
+    text = "generic evil message"
 if keypad_count == 1:
     text = "first riddle hehehe"
 
