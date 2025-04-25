@@ -200,6 +200,9 @@ class Keypad(PhaseThread):
         super().__init__(name, component, target)
         # the default value is an empty string
         self._value = ""
+        self._codes = ["1234", "5678", "9012"]
+        self._current_index = 0
+        
 
     # runs the thread
     def run(self):
@@ -220,20 +223,25 @@ class Keypad(PhaseThread):
                     sleep(0.1)
                 # log the key
                 self._value += str(key)
-                # the combination is correct -> phase defused
-                if (self._value == self._target):
-                    self._defused = True
-                # the combination is incorrect -> phase failed (strike)
-                elif (self._value != self._target[0:len(self._value)]):
-                    self._failed = True
-            sleep(0.1)
+                
+                current_code = self._code[self._current_index]
+                if self._value == current_code:
+                    self._current_index += 1
+                    if self._current_index >= len(self._codes):
+                        self.defused = True
+                    else:
+                        self._value = ""
+                    elif not current_code.startswith(self._value):
+                        self_failed = True
+                sleep(0.1)
 
     # returns the keypad combination as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
-        else:
-            return self._value
+        attempt = self._current_index + 1
+        total = len(self._codes)
+        return f"{self._value} (Code {attempt}/{total})"
 
 # the jumper wires phase
 class Wires(PhaseThread):

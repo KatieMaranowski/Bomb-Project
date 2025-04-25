@@ -13,9 +13,9 @@ COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
 toggle_patterns = {
-    "keypad" : "1001", #up, down, down, up
-    "wires" : "0101",
-    "button" : "0011",
+    "Keypad" : "1001", #up, down, down, up
+    "Wires" : "0101",
+    "Button" : "0011",
     }
 
 
