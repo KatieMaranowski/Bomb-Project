@@ -284,7 +284,7 @@ class Wires(PhaseThread):
             # TODO
             pass
 
-# the pushbutton phase
+#pushbutton phase
 class Button(PhaseThread):
     def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
         super().__init__(name, component_state, target)
@@ -299,6 +299,15 @@ class Button(PhaseThread):
         # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
         self._timer = timer
         
+        
+    #setting color values
+        def _set_color(self, color):
+            self.rgb[0].value = not (color == "R")
+            self.rgb[1].value = not (color == "G")
+            self.rgb[2].value = not (color == "B")
+            self.current_color = color
+            
+    #reset the toggles
     def reset(self):
         self._value = ""
         self._current_index = 0
@@ -308,7 +317,38 @@ class Button(PhaseThread):
     # runs the thread
     def run(self):
         self._running = True
-        # set the RGB LED color
+        #picking color randomly
+        while True:
+            new_color = Button.colors[randint(0,2)]
+            self._set_color(new_color)
+            
+            #hold color
+            for _ in range(10): #10 = 1 second
+                self.value:
+                    #checking if right color was pressed
+                    if self.current_color == self.target:
+                        self success = True
+                    else:
+                        self.success = False
+                    #wait time till the button is pressed
+                    sleep(0.5)
+                    while self._state.value:
+                        sleep(0.05)
+                    sleep(0.1)
+    
+    #displaying outcome
+    def __str__(self):
+        if self._value:
+            return f"Pressed ({self.current_color})"
+        return f"{self.current_color} - Target: {self.target_colro}"
+            
+        
+        
+        
+        
+        
+        
+'''        
         self._rgb[0].value = False if self._color == "R" else True
         self._rgb[1].value = False if self._color == "G" else True
         self._rgb[2].value = False if self._color == "B" else True
@@ -343,7 +383,7 @@ class Button(PhaseThread):
             return "DEFUSED"
         else:
             return str("Pressed" if self._value else "Released")
-
+'''
 # the toggle switches phase
 class Toggles(PhaseThread):
     from bomb_configs import toggle_patterns
