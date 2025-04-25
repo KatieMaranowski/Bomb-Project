@@ -204,6 +204,12 @@ class Keypad(PhaseThread):
         self._codes = ["1234", "5678", "9012"]
         self._current_index = 0
         
+    def reset(self):
+    self._value = ""
+    self._current_index = 0
+    self._defused = False
+    self.failed = False
+        
 
     # runs the thread
     def run(self):
@@ -330,12 +336,7 @@ class Toggles(PhaseThread):
     def __init__(self, component, target, phase_map, name="Toggles"):
         super().__init__(name, component, target)
         self._phase_map = phase_map
-        
-    def reset(self):
-        self._value = ""
-        self._current_index = 0
-        self._defused = False
-        self.failed = False
+    
 
     # runs the thread
     def run(self):
