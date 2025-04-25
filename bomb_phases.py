@@ -232,16 +232,15 @@ class Keypad(PhaseThread):
                 self._value += str(key)
                 code = self._codes[self._current_index]
                 
-                if len(self._value) == len(code):
-                    if self._value == code:
-                        if self._current_index == len(self._codes) - 1:
-                            self._defused = True
-                        else:
-                            self._current_index += 1
-                    else:
-                        self._failed = True
-                    
-                    self._value = 
+                if self._value == code and self._current_index == len(self._codes) - 1:
+                    self._defused = True
+                    #self._running = False
+                    break
+                if self._value == code:
+                    self._current_index += 1
+                    self._value = ""
+                elif not code.startswith(self._value):
+                    self._failed = True
                     
             sleep(0.1)
                 
