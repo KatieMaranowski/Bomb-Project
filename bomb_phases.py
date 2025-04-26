@@ -272,16 +272,23 @@ class Wires(PhaseThread):
         self.color = color
         self.connected = connected
         self.cut = False
-        self.instructions = []
+        self.instructions = ["CUT", "DON'T CUT", "SHORT", "DISCONNECT"]
         
     def get_instructions(self):
         #virus will give confusing set of instructions
-        self.insturctions = [
-            f"Cut the {self.color} wire if it is connected to Phase 1.",
-            f"DO NOT cut the {self.color} wire if it's connected to Phase 3.",
-            f"Cut the {self.color} wire if it's even numbered.",
-            f"DO NOT cut the {self.color} wire if it's connected to the red switch."
-            ]
+        if not self.instructions:
+            return "NO INSTRUCTIONS"
+        return random.choice(self.instrcutions)
+    
+    #cutting the wires to remove virus
+    def cut_wire(self):
+        """Method to cut the wires and the wire state to cut"""
+        if not self.cut:
+            self.cut = True
+            print(f"{self.color} wire cut")
+        else:
+            print(f"{self.color} wire is already cut")
+            
         
         #returning random instruction
         return random.choice(self.instructions)
@@ -306,7 +313,7 @@ class Virus:
         self.infect_wires()
      
     #making the wires have a virus
-    def _infect_wires(self):
+    def infect_wires(self):
         """Apply virus effect and give confusing instructions to the wires."""
         for wire in self.wires:
             instruction = wire.get_instrctions()
@@ -329,9 +336,9 @@ class Virus:
     
 #example setup
 wires = [
-    Wire(color="red", connected=True),
-    Wire(color="blue", connected=True),
-    Wire(color="green", connected=True)
+    Wires(color="red", connected=True),
+    Wires(color="blue", connected=True),
+    Wires(color="green", connected=True)
     ]
 
 virus = Virus(wires)
@@ -346,12 +353,8 @@ wires[2].cut_wire()
 
 #check if wires have been cut to remove virus
 virus.check_for_defuse()
-            
-        
-        
-        
-'''        
-    # runs the thread
+
+    #running the thread
     def run(self):
         self._running = True
         while (self._running):
@@ -359,18 +362,19 @@ virus.check_for_defuse()
                 sleep(0.1)
                 continue
         pass
-
-    # returns the jumper wires state as a string
+            
+            
+            #returning wires state as string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # TODO
             pass
-'''
 
 #pushbutton phase
 class Button(PhaseThread):
+    colors = ["R", "G", "B"]
+    
     def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
         super().__init__(name, component_state, target)
         # the default value is False/Released
@@ -383,14 +387,31 @@ class Button(PhaseThread):
         self._color = color
         # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
         self._timer = timer
+        self.current color = None
         
         
     #setting color values
         def _set_color(self, color):
-            self.rgb[0].value = not (color == "R")
-            self.rgb[1].value = not (color == "G")
-            self.rgb[2].value = not (color == "B")
-            self.current_color = color
+            """Update the RGB LEDs to the selected color via GPIO."""
+            if color == "R":
+                #setting red on and other colors off
+                GPIO.output(self._rgb[0], GPIO.HIGH) 
+                GPIO.output(self._rgb[1], GPIO.LOW)
+                GPIO.output(self._rgb[2], GPIO.LOW)
+            #turning green on and others off
+            elif color == "G":
+                GPIO.output(self._rgb[0], GPIO.LOW)
+                GPIO.output(self._rgb[1], GPIO.HIGH)
+                GPIO.output(self._rgb[2], GPIO.LOW)
+            #turning blue on and others off
+                elif color == "B":
+                    GPIO.output(self._rgb[0], GPIO.LOW)
+                    GPIO.output(self._rgb[1], GPIO.LOW)
+                    GPIO.output(self._rgb[2], GPIO.HIGH)
+                    
+                self.current_color = color
+            
+                
             
     #reset the toggles
     def reset(self):
@@ -413,16 +434,25 @@ class Button(PhaseThread):
                     #checking if right color was pressed
                     if self.current_color == self.target:
                         self success = True
+                        print(f"Button pressed correctly! Color:{self.current_color}")
                     else:
                         self.success = False
-                    #wait time till the button is pressed
-                    sleep(0.5)
-                    while self._state.value:
-                        sleep(0.05)
-                    sleep(0.1)
+                        print(f"Wrong button press! Color was: {self.current_color}")
+                    
+                    break
+                
+                #wait time till the button is pressed
+                sleep(0.1)
+                
+            #if button was not pressed in time
+            if not self._value:
+                self.success = False
+                print("Button was not pressed in time.")
+            self.reset()
     
     #displaying outcome
     def __str__(self):
+        """String representation of button state."""
         if self._value:
             return f"Pressed ({self.current_color})"
         return f"{self.current_color} - Target: {self.target_colro}"
