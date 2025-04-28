@@ -70,7 +70,9 @@ class Lcd(Frame):
         # the toggle switches status
         self._ltoggles = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 18), text="Toggles: ")
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
-        self.viruscharacter2.grid(row=6,column=0, padx = 0, pady = 350)
+        self.textbox.grid(row = 4, column = 2)
+        self.viruscharacter2.grid(row = 5, column = 3)
+        
         
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
