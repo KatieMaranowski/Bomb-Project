@@ -9,7 +9,6 @@ font_example = ("Arial", 16, "bold")
 
 def evil_messages(keypad_count):
   messages = ["Nothing can stop me now","THIS ISN'T EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh","Didn't anyone ever teach you internet safety?"]
-  sleep(2)
   text = random.choice(messages)
 
 if keypad_count == 0:

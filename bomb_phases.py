@@ -18,6 +18,9 @@ from time import sleep
 import os
 import sys
 
+###### messages/text for GUI setup#######
+messages = ["Nothing can stop me now","THIS ISN'T EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh","Didn't anyone ever teach you internet safety?"]
+text = random.choice(messages)
 #########
 # classes
 #########
@@ -48,7 +51,7 @@ class Lcd(Frame):
     # sets up the LCD GUI
     def setup(self):
         global keypad_count
-        
+        global text
         self.textbox = Text(window,  width = 30, height = 10,fg = '#00008B', bg = '#FFFFFF', font = font_example, wrap=WORD)
         textboxtext = "{}".format(text)
         self.textbox.insert(END, textboxtext)
