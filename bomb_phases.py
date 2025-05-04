@@ -288,72 +288,82 @@ class Wires(PhaseThread):
 # the pushbutton phase
 class Button(PhaseThread):
     def __init__(self, component_state, component_rgb, _old_target, _old_color, timer, name="Button"):
-        super.()__init__(name, component_state, None)
-        self._component = component_state
-        self._rgb = component_rgb
-        self._timer = timer
-        
-        self._num_events = 3
-        self._min_gap = 30
-        self._defused_cnt = 0
-        self._awaiting = False
-        
-        total = timer._value
-        margin = self._min_gap*(self._num_events-1)
-        segment = (total - margin) // self._num_events
-        
-        self._thresholds []
-        for i in range (self._num_events):
-            seg_start = i*(segment + self._min_gap)
-            seg_end = seg_start + segment
-            rind = randin(seg_start, seg_end) #make sure that we aren't just triggering >30s (so that all the events actually happen before bomb blows up)
-            self._thresholds.append(total - rind)
-        self._thresholds.sort(reverse = True) #highest to lowest so they go in order
+        super().__init__(name, component_state, None)
+        self._component    = component_state
+        self._rgb          = component_rgb
+        self._timer        = timer
 
-    # runs the thread
+        # how many flashes & min gap
+        self._num_events   = 3
+        self._min_gap      = 30
+        self._defused_cnt  = 0
+        self._awaiting     = False
+
+        total = timer._value
+        margin = self._min_gap * (self._num_events - 1)
+        segment = (total - margin) // self._num_events
+
+        # pick 3 random trigger–times, sorted high→low
+        self._thresholds = []
+        for i in range(self._num_events):
+            seg_start = i * (segment + self._min_gap)
+            seg_end   = seg_start + segment
+            t = randint(seg_start, seg_end)
+            self._thresholds.append(total - t)
+        self._thresholds.sort(reverse=True)
+
     def run(self):
         self._running = True
-        
-        self._rgb[0].value = False #red
-        self._rgb[1].value = True # green off
-        self._rgb[2].value = True #blue off
-        
+        pressed = False
+
+        # start red
+        self._rgb[0].value = False  # red ON
+        self._rgb[1].value = True   # green OFF
+        self._rgb[2].value = True   # blue OFF
+
         while self._running:
-            if (self._defused_cnt < self._num_events) and (not self.awaiting):
-                if self._timer._value <= self.thresholds[self._defused_cnt]:
-                    #green time
-                    self._rgb[0].value = True #red off
-                    self._rgb [1].value = False
-                    self.awaiting = True
-                    
+            # 1) trigger the next green flash if it’s time
+            if self._defused_cnt < self._num_events and not self._awaiting:
+                if self._timer._value <= self._thresholds[self._defused_cnt]:
+                    # flash green
+                    self._rgb[0].value = True   # red OFF
+                    self._rgb[1].value = False  # green ON
+                    self._awaiting = True
+
+            # 2) only listen if toggles → Button *and* we’re awaiting
             if not (self._active and self._awaiting):
                 sleep(0.1)
                 continue
-            
-            if self._component.value:
-                pressed = True
-            else:
-                if "pressed" in locals() and pressed:
-                    self._defused_cnt += 1
-                    self._awaiting = False
-                    #back to red
-                    self._rgb[0].value = False
-                    self._rgb[1].value = True
-                    
-                    if self._defused_cnt >= self.num_events:
-                        self.defused = True
-                        break
-                    pressed = False
-                sleep(0.1)
-                
 
-    # returns the pushbutton's state as a string
+            # 3) detect press→release
+            current = self._component.value
+            if current and not pressed:
+                # button just depressed
+                pressed = True
+            elif not current and pressed:
+                # button released after a press
+                pressed = False
+                self._defused_cnt += 1
+                self._awaiting = False
+
+                # back to red
+                self._rgb[0].value = False
+                self._rgb[1].value = True
+
+                # if we’ve done all flashes, mark defused
+                if self._defused_cnt >= self._num_events:
+                    self._defused = True
+                    break
+
+            sleep(0.1)
+
     def __str__(self):
-        if (self._defused):
+        if self._defused:
             return "DEFUSED"
         if self._awaiting:
-            return ">>PUSH ME<<"
+            return ">> PUSH ME! <<"
         return "Waiting..."
+
 
 # the toggle switches phase
 class Toggles(PhaseThread):
