@@ -8,6 +8,7 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases import *
+from bomb_gui import *
 
 ###########
 # functions
@@ -72,7 +73,7 @@ def check_phases():
     # check the timer
     if (timer._running):
         # update the GUI
-        gui._ltimer["text"] = f"Time left: {timer}"
+        gui.update_status(timer, keypad, wires, button, toggles, strikes_left)
     else:
         # the countdown has expired -> explode!
         # turn off the bomb and render the conclusion GUI
@@ -185,9 +186,9 @@ def turn_off():
 ######
 
 # initialize the LCD GUI
-window = Tk()
-window.config(bg='#D3D3D3')
-gui = Lcd(window)
+#window = Tk()
+#window.config(bg='#D3D3D3')
+gui = BombGUI(open_image_path="virusopen.png", closed_image_path="virusclosed.png")
 
 # initialize the bomb strikes and active phases (i.e., not yet defused)
 strikes_left = NUM_STRIKES
