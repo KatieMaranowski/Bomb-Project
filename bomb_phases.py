@@ -159,6 +159,7 @@ class Timer(PhaseThread):
         self._sec = ""
         # by default, each tick is 1 second
         self._interval = 1
+        self._active = True
 
     # runs the thread
     def run(self):
