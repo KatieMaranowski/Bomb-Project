@@ -314,7 +314,7 @@ class Button(PhaseThread):
         print("DEBUG || WHEN BUTTON WILL FLASH")
         for rind in self._thresholds:
             mins, sec = divmod(rind, 60)
-            print(f" {mins:02d}:{secs:02d} ({rind}s)")
+            print(f" {mins:02d}:{sec:02d} ({rind}s)")
         
     def reset(self):
         pass
