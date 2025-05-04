@@ -293,21 +293,6 @@ class Button(PhaseThread):
         self._rgb          = component_rgb
         self._timer        = timer
     
-    
-    def reset(self):
-        # clear the “need to press” state
-        self._defused_cnt = 0
-        self._awaiting    = False
-        # clear any success/failure flags
-        self._defused     = False
-        self._failed      = False
-        # reset the LED back to solid red
-        self._rgb[0].value = False  # red ON
-        self._rgb[1].value = True   # green OFF
-        self._rgb[2].value = True   # blue OFF
-        
-        
-
         # how many flashes & min gap
         self._num_events   = 3
         self._min_gap      = 30
@@ -326,6 +311,18 @@ class Button(PhaseThread):
             t = randint(seg_start, seg_end)
             self._thresholds.append(total - t)
         self._thresholds.sort(reverse=True)
+        
+    def reset(self):
+        # clear the “need to press” state
+        self._defused_cnt = 0
+        self._awaiting    = False
+        # clear any success/failure flags
+        self._defused     = False
+        self._failed      = False
+        # reset the LED back to solid red
+        self._rgb[0].value = False  # red ON
+        self._rgb[1].value = True   # green OFF
+        self._rgb[2].value = True   # blue OFF
 
     def run(self):
         self._running = True
