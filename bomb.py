@@ -8,6 +8,17 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases import *
+from bomb_gui import BombGUI
+
+def _start_bomb_window():
+    gui2 = BombGUI (
+        open_image_path = "virusopen.png",
+        closed_image_path = "virusclosed.png",
+        typing_delay = 100
+        )
+    gui2.mainloop
+    
+threading.Thread(target=_start_bomb_window, daemon = True).start()
 
 ###########
 # functions

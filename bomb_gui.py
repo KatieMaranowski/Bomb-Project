@@ -56,32 +56,47 @@ class BombGUI(tk.Tk):
         self.text_box.tag_configure("center", justify="center")
 
         # initial message
-        self.say("Welcome, Player! The bomb awaits.")
+        self.say("Welcome, Player! The bomb awaits...")
 
-        # --- Status display below dialogue ---
-        self.status_frame = ttk.Frame(self)
-        self.status_frame.pack(fill=tk.X, padx=20, pady=(0,20))
-
-        self.lbl_timer   = ttk.Label(self.status_frame, text="Time left: ")
-        self.lbl_timer.grid(row=0, column=0, padx=5, sticky="w")
-        self.lbl_keypad  = ttk.Label(self.status_frame, text="Keypad: ")
-        self.lbl_keypad.grid(row=0, column=1, padx=5, sticky="w")
-        self.lbl_wires   = ttk.Label(self.status_frame, text="Wires: ")
-        self.lbl_wires.grid(row=0, column=2, padx=5, sticky="w")
-        self.lbl_button  = ttk.Label(self.status_frame, text="Button: ")
-        self.lbl_button.grid(row=1, column=0, padx=5, sticky="w")
-        self.lbl_toggles = ttk.Label(self.status_frame, text="Toggles: ")
-        self.lbl_toggles.grid(row=1, column=1, padx=5, sticky="w")
-        self.lbl_strikes = ttk.Label(self.status_frame, text="Strikes left: ")
-        self.lbl_strikes.grid(row=1, column=2, padx=5, sticky="w")
-
-    def update_status(self, timer, keypad, wires, button, toggles, strikes):
+    def say(self, message: str):
         """
-        Refresh all status labels. Call this periodically (e.g., from bomb.py check_phases()).
+        Display and type out a message, toggling mouth images randomly as it goes.
         """
-        self.lbl_timer["text"]   = f"Time left: {timer}"
-        self.lbl_keypad["text"]  = f"Keypad: {keypad}"
-        self.lbl_wires["text"]   = f"Wires: {wires}"
-        self.lbl_button["text"]  = f"Button: {button}"
-        self.lbl_toggles["text"] = f"Toggles: {toggles}"
-        self.lbl_strikes["text"] = f"Strikes left: {strikes}"
+        self._current_message = message + "\n"
+        self._typing_index = 0
+        # clear previous content
+        self.text_box.config(state=tk.NORMAL)
+        self.text_box.delete("1.0", tk.END)
+        # ensure starting with mouth closed
+        self._mouth_open = False
+        self.photo_label.config(image=self.photo_closed)
+        self._type_next_char()
+
+    def _type_next_char(self):
+        if self._typing_index < len(self._current_message):
+            # randomly decide mouth state for a natural talking effect
+            self._mouth_open = random.choice([True, False])
+            self.photo_label.config(
+                image=self.photo_open if self._mouth_open else self.photo_closed
+            )
+
+            # insert next character with center tag
+            ch = self._current_message[self._typing_index]
+            self.text_box.insert(tk.END, ch, ("center",))
+            self.text_box.see(tk.END)
+            self._typing_index += 1
+
+            # schedule next char
+            self.after(self._typing_delay, self._type_next_char)
+        else:
+            # finished typing: ensure mouth is closed and disable editing
+            self.photo_label.config(image=self.photo_closed)
+            self.text_box.config(state=tk.DISABLED)
+
+if __name__ == "__main__":
+    gui = BombGUI(
+        open_image_path="virusopen.png",
+        closed_image_path="virusclosed.png",
+        typing_delay=100
+    )
+    gui.mainloop()
