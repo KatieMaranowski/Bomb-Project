@@ -1,21 +1,19 @@
-Exception in thread Exception in Tkinter callbackToggles
-:
+Exception in thread Thread-1 (_start_bomb_window):
 Traceback (most recent call last):
   File "/usr/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
     self.run()
-  File "/home/spartans/Downloads/Bomb-Project-main/bomb_phases.py", line 328, in run
-    phase = self._phase_map[name]
-  Traceback (most recent call last):
-   File "/usr/lib/python3.11/tkinter/__init__.py", line 1948, in __call__
-    return self.func(*args)
-           ^^^^^^^^^^^^^^^^
-    File "/usr/lib/python3.11/tkinter/__init__.py", line 861, in callit
-    func(*args)
-   File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 27, in bootup
-    check_phases()
-   File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 126, in check_phases
-    gui._ltoggles["text"] = f"Toggles: {toggles}"
-                            ^^^^^^^^^^^^^^^^^^^^^
- TypeError: __str__ returned non-string (type NoneType)
-                    ^^^^
-NameError: name 'name' is not defined. Did you mean: 'Frame'?
+  File "/usr/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 15, in _start_bomb_window
+    gui2 = BombGUI (
+           ^^^^^^^^^
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb_gui.py", line 39, in __init__
+    self.photo_label = ttk.Label(self, image=self.photo_closed)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/tkinter/ttk.py", line 729, in __init__
+    Widget.__init__(self, master, "ttk::label", kw)
+  File "/usr/lib/python3.11/tkinter/ttk.py", line 527, in __init__
+    tkinter.Widget.__init__(self, master, widgetname, kw=kw)
+  File "/usr/lib/python3.11/tkinter/__init__.py", line 2628, in __init__
+    self.tk.call(
+_tkinter.TclError: image "pyimage2" doesn't exist
