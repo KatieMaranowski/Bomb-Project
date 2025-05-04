@@ -242,7 +242,7 @@ class Keypad(PhaseThread):
                 if self._value == code:
                     self._current_index += 1
                     self._value = ""
-                elif not code.startswith(self._value):
+                elif len(self._value) >= len(code): #only checks if right after 4 digits are put in (removes bruteforce method)
                     self._failed = True
                     
             sleep(0.1)
