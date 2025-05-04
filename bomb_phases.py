@@ -8,70 +8,103 @@
 # Team: 
 #################################
 
-# import the configs
-from bomb_configs import *
-# other imports
-from tkinter import *
-import tkinter
-from threading import Thread
+# bomb_phases.py
+import tkinter as tk
+from tkinter import Frame, Label, Text, LEFT, BOTH, W
 from time import sleep
-import os
-import sys
+from threading import Thread
+import os, sys
 
-#########
-# classes
-#########
-# the LCD display GUI
+try:
+    from PIL import Image, ImageTk
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
+
 class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
-        # make the GUI fullscreen
         window.attributes("-fullscreen", True)
-        # we need to know about the timer (7-segment display) to be able to pause/unpause it
-        self._timer = None
-        # we need to know about the pushbutton to turn off its LED when the program exits
-        self._button = None
-        # setup the initial "boot" GUI
-        self.setupBoot()
 
-    # sets up the LCD "boot" GUI
-    def setupBoot(self):
-        # set column weights
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=2)
-        self.columnconfigure(2, weight=1)
-        # the scrolling informative "boot" text
-        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
-        self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
+        # placeholders for binding hardware threads
+        self._timer  = None
+        self._button = None
+
+        # text and graphics for “boot” phase
+        self._lscroll = Label(self, bg="black", fg="white",
+                              font=("Courier New", 14), text="", justify=LEFT)
+        self._lscroll.grid(row=0, column=0, columnspan=4, sticky=W)
+
+        # reserve columns 0–3
+        for c in range(4):
+            self.columnconfigure(c, weight=1)
+
         self.pack(fill=BOTH, expand=True)
 
-    # sets up the LCD GUI
     def setup(self):
-        # the timer
-        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
+        # — column 0–2: your existing widgets —
+
+        # timer
+        self._ltimer = Label(self, bg="black", fg="#00ff00",
+                             font=("Courier New", 18), text="Time left:")
         self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
-        # the keypad passphrase
-        self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
+
+        # keypad
+        self._lkeypad = Label(self, bg="black", fg="#00ff00",
+                              font=("Courier New", 18), text="Keypad:")
         self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
-        # the jumper wires status
-        self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
+
+        # wires
+        self._lwires = Label(self, bg="black", fg="#00ff00",
+                             font=("Courier New", 18), text="Wires:")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        # the pushbutton status
-        self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
+
+        # button
+        self._lbutton = Label(self, bg="black", fg="#00ff00",
+                              font=("Courier New", 18), text="Button:")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
-        # the toggle switches status
-        self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
+
+        # toggles
+        self._ltoggles = Label(self, bg="black", fg="#00ff00",
+                               font=("Courier New", 18), text="Toggles:")
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
-        # the strikes left
-        self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
+
+        # strikes
+        self._lstrikes = Label(self, bg="black", fg="#00ff00",
+                               font=("Courier New", 18), text="Strikes:")
         self._lstrikes.grid(row=5, column=2, sticky=W)
-        if (SHOW_BUTTONS):
-            # the pause button (pauses the timer)
-            self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
-            self._bpause.grid(row=6, column=0, pady=40)
-            # the quit button
-            self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
-            self._bquit.grid(row=6, column=2, pady=40)
+
+        # — column 3: character + chat —
+
+        # load images
+        if PIL_AVAILABLE:
+            img_o = Image.open("virusopen.png").resize((300,300), Image.LANCZOS)
+            img_c = Image.open("virusclosed.png").resize((300,300), Image.LANCZOS)
+            self._char_open   = ImageTk.PhotoImage(img_o)
+            self._char_closed = ImageTk.PhotoImage(img_c)
+        else:
+            self._char_open   = tk.PhotoImage(file="virusopen.png")
+            self._char_closed = tk.PhotoImage(file="virusclosed.png")
+
+        # character label (starts closed)
+        self._char_label = Label(self, image=self._char_closed, bg="black")
+        self._char_label.grid(row=1, column=3, rowspan=2, padx=10, pady=5)
+
+        # chat box
+        self._chat_box = Text(self, height=6, width=30,
+                              bg="black", fg="#00ff00",
+                              font=("Courier New",14),
+                              state=tk.DISABLED, relief=tk.SUNKEN, bd=2)
+        self._chat_box.grid(row=3, column=3, rowspan=3, padx=10, pady=5)
+        self._chat_box.tag_configure("center", justify="center")
+
+    def say(self, message: str):
+        """Append a line of dialogue to the chat box."""
+        self._chat_box.config(state=tk.NORMAL)
+        self._chat_box.insert(tk.END, message + "\n", ("center",))
+        self._chat_box.see(tk.END)
+        self._chat_box.config(state=tk.DISABLED)
+
 
     # lets us pause/unpause the timer (7-segment display)
     def setTimer(self, timer):
