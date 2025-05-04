@@ -52,6 +52,11 @@ class Lcd(Frame):
         self._chat_box.insert(END, "")
         self._chat_box.config(state=DISABLED)
 
+        
+        
+        
+        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
+        self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
         self.pack(fill=BOTH, expand=True)
 
     # sets up the LCD GUI
@@ -98,6 +103,7 @@ class Lcd(Frame):
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
+        self._lscroll["text"] = ""
         self._ltimer.destroy()
         self._lkeypad.destroy()
         self._lwires.destroy()
