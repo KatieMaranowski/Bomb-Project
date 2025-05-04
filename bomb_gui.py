@@ -2,13 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 import random
 
-# Optional: to support more image formats, install Pillow:
-try:
-    from PIL import Image, ImageTk
-    PIL_AVAILABLE = True
-except ImportError:
-    PIL_AVAILABLE = False
-
 class BombGUI(tk.Tk):
     def __init__(
         self,
