@@ -8,205 +8,98 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases import *
-import threading
+# import the talking‐virus GUI
 from bomb_gui import BombGUI
-
-def _start_bomb_window():
-    gui2 = BombGUI (
-        open_image_path = "virusopen.png",
-        closed_image_path = "virusclosed.png",
-        typing_delay = 100
-        )
-    gui2.mainloop()
-    
-threading.Thread(target=_start_bomb_window, daemon = True).start()
 
 ###########
 # functions
 ###########
+
 # generates the bootup sequence on the LCD
 def bootup(n=0):
-    # if we're not animating (or we're at the end of the bootup text)
-    if (not ANIMATE or n == len(boot_text)):
-        # if we're not animating, render the entire text at once (and don't process \x00)
-        if (not ANIMATE):
-            gui._lscroll["text"] = boot_text.replace("\x00", "")
-        # configure the remaining GUI widgets
-        gui.setup()
-        # setup the phase threads, execute them, and check their statuses
-        if (RPi):
-            setup_phases()
-            check_phases()
-    # if we're animating
+    global window, gui, strikes_left, active_phases
+
+    # scroll the boot text
+    text = BOOT_TEXT[n : n + SCREEN_WIDTH]
+    gui._lscroll["text"] = text
+    if n < len(BOOT_TEXT) - SCREEN_WIDTH:
+        gui.after(BOOT_SPEED, bootup, n + 1)
     else:
-        # add the next character (but don't render \x00 since it specifies a longer pause)
-        if (boot_text[n] != "\x00"):
-            gui._lscroll["text"] += boot_text[n]
-
-        # scroll the next character after a slight delay (\x00 is a longer delay)
-        gui.after(25 if boot_text[n] != "\x00" else 750, bootup, n + 1)
-
-# sets up the phase threads
-def setup_phases():
-    global timer, keypad, wires, button, toggles
-
-    # setup the timer thread
-    timer = Timer(component_7seg, COUNTDOWN)
-    # bind the 7-segment display to the LCD GUI so that it can be paused/unpaused from the GUI
-    gui.setTimer(timer)
-    # setup the keypad thread
-    keypad = Keypad(component_keypad, keypad_target)
-    # setup the jumper wires thread
-    wires = Wires(component_wires, wires_target)
-    # setup the pushbutton thread
-    button = Button(component_button_state, component_button_RGB, button_target, button_color, timer)
-    # bind the pushbutton to the LCD GUI so that its LED can be turned off when we quit
-    gui.setButton(button)
-    # setup the toggle switches thread
-    phase_map = {
-        "Keypad": keypad,
-        "Wires" : wires,
-        "Button": button,
-    }
-    
-    toggles = Toggles(component_toggles, toggles_target, phase_map)    
-    # start the phase threads
-    timer.start()
-    keypad.start()
-    wires.start()
-    button.start()
-    toggles.start()
+        # once the scroll finishes, switch to the main display
+        gui.setup()
+        # start the timer countdown
+        timer.start()
+        # start each phase thread
+        keypad.start()
+        wires.start()
+        button.start()
+        toggles.start()
+        # and begin phase‐checking
+        check_phases()
 
 # checks the phase threads
 def check_phases():
     global active_phases
-    
-    # check the timer
-    if (timer._running):
-        # update the GUI
+
+    # update the timer display (or explode on timeout)
+    if timer._running:
         gui._ltimer["text"] = f"Time left: {timer}"
     else:
-        # the countdown has expired -> explode!
-        # turn off the bomb and render the conclusion GUI
         turn_off()
         gui.after(100, gui.conclusion, False)
-        # don't check any more phases
         return
-    # check the keypad
-    if keypad._running and keypad._active:
-        # update the GUI
-        gui._lkeypad["text"] = f"Combination: {keypad}"
-        # the phase is defused -> stop the thread
-        if (keypad._defused):
-            keypad._running = False
-            active_phases -= 1
-        # the phase has failed -> strike
-        elif (keypad._failed):
-            strike()
-            # reset the keypad
-            keypad._failed = False
-            keypad._value = ""
-    # check the wires
-    if (wires._running) and wires._active:
-        # update the GUI
-        gui._lwires["text"] = f"Wires: {wires}"
-        # the phase is defused -> stop the thread
-        if (wires._defused):
-            wires._running = False
-            active_phases -= 1
-        # the phase has failed -> strike
-        elif (wires._failed):
-            strike()
-            # reset the wires
-            wires._failed = False
-    # check the button
-    if (button._running) and button._active:
-        # update the GUI
-        gui._lbutton["text"] = f"Button: {button}"
-        # the phase is defused -> stop the thread
-        if (button._defused):
-            button._running = False
-            active_phases -= 1
-        # the phase has failed -> strike
-        elif (button._failed):
-            strike()
-            # reset the button
-            button._failed = False
-    # check the toggles
-    if (toggles._running):
-        # update the GUI
-        gui._ltoggles["text"] = f"Toggles: {toggles}"
-        # the phase is defused -> stop the thread
-        if (toggles._defused):
-            toggles._running = False
-            active_phases -= 1
-        # the phase has failed -> strike
-        elif (toggles._failed):
-            strike()
-            # reset the toggles
-            toggles._failed = False
 
-    # note the strikes on the GUI
+    # update each phase’s label
+    gui._lkeypad["text"] = f"Keypad phase: {keypad}"
+    gui._lwires["text"]  = f"Wires phase: {wires}"
+    gui._lbutton["text"] = f"Button phase: {button}"
+    gui._ltoggles["text"] = f"Toggles phase: {toggles}"
     gui._lstrikes["text"] = f"Strikes left: {strikes_left}"
-    # too many strikes -> explode!
-    if (strikes_left == 0):
-        # turn off the bomb and render the conclusion GUI
-        turn_off()
-        gui.after(1000, gui.conclusion, False)
-        # stop checking phases
-        return
 
-    # the bomb has been successfully defused!
-    if (active_phases == 0):
-        # turn off the bomb and render the conclusion GUI
+    # count how many phases are still active
+    active_phases = sum(1 for p in (keypad, wires, button, toggles) if p._active)
+
+    # if they’re all defused, celebrate!
+    if active_phases == 0:
         turn_off()
         gui.after(100, gui.conclusion, True)
-        # stop checking phases
-        return
+    else:
+        # otherwise, re‐check in a bit
+        gui.after(50, check_phases)
 
-    # check the phases again after a slight delay
-    gui.after(100, check_phases)
-
-# handles a strike
-def strike():
-    global strikes_left
-    
-    # note the strike
-    strikes_left -= 1
-
-# turns off the bomb
+# helper to turn off everything (called on success or failure)
 def turn_off():
-    # stop all threads
-    timer._running = False
-    keypad._running = False
-    wires._running = False
-    button._running = False
-    toggles._running = False
+    timer.pause()
+    keypad.pause()
+    wires.pause()
+    button.pause()
+    toggles.pause()
 
-    # turn off the 7-segment display
-    component_7seg.blink_rate = 0
-    component_7seg.fill(0)
-    # turn off the pushbutton's LED
-    for pin in button._rgb:
-        pin.value = True
+#################################
+# Main window setup & launch
+#################################
 
-
-
-######
-# MAIN
-######
-
-# initialize the LCD GUI
+# create the single root window
 window = Tk()
 window.config(bg='#D3D3D3')
+
+# plug in the LCD GUI
 gui = Lcd(window)
 
-# initialize the bomb strikes and active phases (i.e., not yet defused)
-strikes_left = NUM_STRIKES
+# create the talking‐virus window as a Toplevel on the same loop
+BombGUI(
+    master=window,
+    open_image_path="virusopen.png",
+    closed_image_path="virusclosed.png",
+    typing_delay=100
+)
+
+# initialize the bomb strikes and active phases
+strikes_left  = NUM_STRIKES
 active_phases = NUM_PHASES
 
-# "boot" the bomb
+# start the boot sequence after a short delay
 gui.after(1000, bootup)
 
-# display the LCD GUI
+# run the single Tk event loop for both windows
 window.mainloop()

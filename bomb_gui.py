@@ -8,14 +8,15 @@ try:
 except ImportError:
     PIL_AVAILABLE = False
 
-class BombGUI(tk.Tk):
+class BombGUI(tk.Toplevel):
     def __init__(
         self,
+        master,
         open_image_path: str = "virusopen.png",
         closed_image_path: str = "virusclosed.png",
         typing_delay: int = 50
     ):
-        super().__init__()
+        super().__init__(master)
         self.title("Bomb Interface")
         self.minsize(600, 500)
 
