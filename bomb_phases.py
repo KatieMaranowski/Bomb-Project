@@ -41,8 +41,17 @@ class Lcd(Frame):
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
         # the scrolling informative "boot" text
-        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
-        self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
+        
+        self._virus_image = PhotoImage(file="virusopen.png")
+        self._image_label = Label(self, image=self._virus_image, bg="black")
+        self._image_label.grid(row=0, column=0, columnspan=3)
+
+        self._chat_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=5)
+        self._chat_box.grid(row=1, column=0, columnspan=3, sticky=W+E)
+        
+        self._chat_box.insert(END, "")
+        self._chat_box.config(state=DISABLED)
+
         self.pack(fill=BOTH, expand=True)
 
     # sets up the LCD GUI
@@ -89,7 +98,6 @@ class Lcd(Frame):
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
         # destroy/clear widgets that are no longer needed
-        self._lscroll["text"] = ""
         self._ltimer.destroy()
         self._lkeypad.destroy()
         self._lwires.destroy()
