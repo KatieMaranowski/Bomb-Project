@@ -43,17 +43,8 @@ class Lcd(Frame):
         # the scrolling informative "boot" text
         virusopen = PhotoImage(file="virusopen.png")
         self._virus_image = virusopen.subsample(4,4)
-        self._image_label.place(relx=1.0, rely=1.0, anchor=SE)
-        
         self._image_label = Label(self, image=self._virus_image, bg="black")
-        self._image_label.grid(row=0, column=0, columnspan=3)
-
-        self._chat_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=5)
-        self._chat_box.grid(row=1, column=0, columnspan=3, sticky=W+E)
-        self._chat_box.insert(END, "")
-        self._chat_box.config(state=DISABLED)
-
-        
+        self._image_label.place(relx=1.0, rely=1.0, anchor=SE)   
         
         
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
