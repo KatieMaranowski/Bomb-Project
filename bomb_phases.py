@@ -42,7 +42,8 @@ class Lcd(Frame):
         self.columnconfigure(2, weight=1)
         # the scrolling informative "boot" text
         virusopen = PhotoImage(file="virusopen.png")
-        self._virus_image = orig.subsample(4,4)
+        self._virus_image = virusopen.subsample(4,4)
+        self._image_label.place(relx=1.0, rely=1.0, anchor=SE)
         
         self._image_label = Label(self, image=self._virus_image, bg="black")
         self._image_label.grid(row=0, column=0, columnspan=3)
