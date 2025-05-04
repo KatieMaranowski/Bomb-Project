@@ -209,7 +209,6 @@ class Keypad(PhaseThread):
         
     def reset(self):
         self._value = ""
-        self._current_index = 0
         self._defused = False
         self._failed = False
         
@@ -313,16 +312,7 @@ class Button(PhaseThread):
         self._thresholds.sort(reverse=True)
         
     def reset(self):
-        # clear the “need to press” state
-        self._defused_cnt = 0
-        self._awaiting    = False
-        # clear any success/failure flags
-        self._defused     = False
-        self._failed      = False
-        # reset the LED back to solid red
-        self._rgb[0].value = False  # red ON
-        self._rgb[1].value = True   # green OFF
-        self._rgb[2].value = True   # blue OFF
+        continue
 
     def run(self):
         self._running = True
