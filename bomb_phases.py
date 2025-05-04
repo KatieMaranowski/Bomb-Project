@@ -18,9 +18,6 @@ from time import sleep
 import os
 import sys
 
-###### messages/text for GUI setup#######
-messages = ["Nothing can stop me now","THIS ISN'T EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh","Didn't anyone ever teach you internet safety?"]
-text = random.choice(messages)
 #########
 # classes
 #########
@@ -44,39 +41,27 @@ class Lcd(Frame):
         self.columnconfigure(1, weight=2)
         self.columnconfigure(2, weight=1)
         # the scrolling informative "boot" text
-        self._lscroll = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 14), text="", justify=LEFT)
+        self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
         self.pack(fill=BOTH, expand=True)
 
     # sets up the LCD GUI
     def setup(self):
-        global keypad_count
-        global text
-        self.textbox = Text(window,  width = 30, height = 10,fg = '#00008B', bg = '#FFFFFF', font = font_example, wrap=WORD)
-        textboxtext = "{}".format(text)
-        self.textbox.insert(END, textboxtext)
-        self.viruscharacter = PhotoImage(file="viruscharacter.gif")
-        self.viruscharacter2 = Label(window, image=self.viruscharacter, bg='#D3D3D3')
-        
         # the timer
-        self._ltimer = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Time left: ")
+        self._ltimer = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Time left: ")
         self._ltimer.grid(row=1, column=0, columnspan=3, sticky=W)
         # the keypad passphrase
-        self._lkeypad = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Keypad: 0/3")
+        self._lkeypad = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Keypad phase: ")
         self._lkeypad.grid(row=2, column=0, columnspan=3, sticky=W)
         # the jumper wires status
-        self._lwires = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Wires: ")
+        self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
         # the pushbutton status
-        self._lbutton = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 16), text="Button: ")
+        self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
         # the toggle switches status
-        self._ltoggles = Label(self, bg="#D3D3D3", fg="#00008B", font=("Arial", 18), text="Toggles: ")
+        self._ltoggles = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Toggles phase: ")
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
-        self.textbox.grid(row = 4, column = 2)
-        self.viruscharacter2.grid(row = 5, column = 3)
-        
-        
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
         self._lstrikes.grid(row=5, column=2, sticky=W)
@@ -271,95 +256,18 @@ class Keypad(PhaseThread):
 
         return f"{self._value} (Code {attempt}/{total})"
 
-#jumper wires phase
+# the jumper wires phase
 class Wires(PhaseThread):
-    def __init__(self, color, connected, name="Wires"):  #add pins
-        self.color = color
-        self.connected = connected
-        self.cut = False
-        self.instructions = ["CUT", "DON'T CUT", "SHORT", "DISCONNECT"]
+    def __init__(self, component, target, name="Wires"):
+        super().__init__(name, component, target)
         
-    def get_instructions(self):
-        #virus will give confusing set of instructions
-        if not self.instructions:
-            return "NO INSTRUCTIONS"
-        return random.choice(self.instrcutions)
-    
-    #cutting the wires to remove virus
-    def cut_wire(self):
-        """Method to cut the wires and the wire state to cut"""
-        if not self.cut:
-            self.cut = True
-            print(f"{self.color} wire cut")
-        else:
-            print(f"{self.color} wire is already cut")
-            
-        
-        #returning random instruction
-        return random.choice(self.instructions)
-    
-    #resetting toggles   
     def reset(self):
         self._value = ""
         self._current_index = 0
         self._defused = False
         self._failed = False
-        
-        
-#creating virus
-class Virus:
-    def __init__(self, wires):
-        self.wires = wires #list of wire objects
-        self.active = False #virus flag
-  
-    #activating wires
-    def activate(self):
-        self.active = True
-        self.infect_wires()
-     
-    #making the wires have a virus
-    def infect_wires(self):
-        """Apply virus effect and give confusing instructions to the wires."""
-        for wire in self.wires:
-            instruction = wire.get_instrctions()
-            print(f"Virus: {instruction}")
-            
-    def check_for_defuse(self):
-        """Check if all wires have been cut and the virus is answered."""
-        if all(wire.cut for wire in self.wires):
-            print("All wires cut. The virus is removed from the screen.")
-            self.active = False   #virus is removed
-        else:
-            print("The virus is still active. Wires need to be cut.")
-            
-    
-    #getting confusing information to remove the wires
-    def get_confusing_instructions(self):
-        """Return the confusing instructions for the wires."""
-        return [wire.get_instructions() for wire in self.wires]
-    
-    
-#example setup
-wires = [
-    Wires(color="red", connected=True),
-    Wires(color="blue", connected=True),
-    Wires(color="green", connected=True)
-    ]
 
-virus = Virus(wires)
-
-#activate virus to confuse player
-virus.activate()
-
-#player interacting with wires cutting them
-wires[0].cut_wire()
-wires[1].cut_wire()
-wires[2].cut_wire()
-
-#check if wires have been cut to remove virus
-virus.check_for_defuse()
-
-    #running the thread
+    # runs the thread
     def run(self):
         self._running = True
         while (self._running):
@@ -367,19 +275,17 @@ virus.check_for_defuse()
                 sleep(0.1)
                 continue
         pass
-            
-            
-            #returning wires state as string
+
+    # returns the jumper wires state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
+            # TODO
             pass
 
-#pushbutton phase
+# the pushbutton phase
 class Button(PhaseThread):
-    colors = ["R", "G", "B"]
-    
     def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
         super().__init__(name, component_state, target)
         # the default value is False/Released
@@ -392,33 +298,7 @@ class Button(PhaseThread):
         self._color = color
         # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
         self._timer = timer
-        self.current color = None
         
-        
-    #setting color values
-        def _set_color(self, color):
-            """Update the RGB LEDs to the selected color via GPIO."""
-            if color == "R":
-                #setting red on and other colors off
-                GPIO.output(self._rgb[0], GPIO.HIGH) 
-                GPIO.output(self._rgb[1], GPIO.LOW)
-                GPIO.output(self._rgb[2], GPIO.LOW)
-            #turning green on and others off
-            elif color == "G":
-                GPIO.output(self._rgb[0], GPIO.LOW)
-                GPIO.output(self._rgb[1], GPIO.HIGH)
-                GPIO.output(self._rgb[2], GPIO.LOW)
-            #turning blue on and others off
-                elif color == "B":
-                    GPIO.output(self._rgb[0], GPIO.LOW)
-                    GPIO.output(self._rgb[1], GPIO.LOW)
-                    GPIO.output(self._rgb[2], GPIO.HIGH)
-                    
-                self.current_color = color
-            
-                
-            
-    #reset the toggles
     def reset(self):
         self._value = ""
         self._current_index = 0
@@ -428,47 +308,7 @@ class Button(PhaseThread):
     # runs the thread
     def run(self):
         self._running = True
-        #picking color randomly
-        while True:
-            new_color = Button.colors[randint(0,2)]
-            self._set_color(new_color)
-            
-            #hold color
-            for _ in range(10): #10 = 1 second
-                self.value:
-                    #checking if right color was pressed
-                    if self.current_color == self.target:
-                        self success = True
-                        print(f"Button pressed correctly! Color:{self.current_color}")
-                    else:
-                        self.success = False
-                        print(f"Wrong button press! Color was: {self.current_color}")
-                    
-                    break
-                
-                #wait time till the button is pressed
-                sleep(0.1)
-                
-            #if button was not pressed in time
-            if not self._value:
-                self.success = False
-                print("Button was not pressed in time.")
-            self.reset()
-    
-    #displaying outcome
-    def __str__(self):
-        """String representation of button state."""
-        if self._value:
-            return f"Pressed ({self.current_color})"
-        return f"{self.current_color} - Target: {self.target_colro}"
-            
-        
-        
-        
-        
-        
-        
-'''        
+        # set the RGB LED color
         self._rgb[0].value = False if self._color == "R" else True
         self._rgb[1].value = False if self._color == "G" else True
         self._rgb[2].value = False if self._color == "B" else True
@@ -503,7 +343,7 @@ class Button(PhaseThread):
             return "DEFUSED"
         else:
             return str("Pressed" if self._value else "Released")
-'''
+
 # the toggle switches phase
 class Toggles(PhaseThread):
     from bomb_configs import toggle_patterns
