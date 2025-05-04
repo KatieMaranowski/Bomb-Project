@@ -307,9 +307,14 @@ class Button(PhaseThread):
         for i in range(self._num_events):
             seg_start = i * (segment + self._min_gap)
             seg_end   = seg_start + segment
-            t = randint(seg_start, seg_end)
-            self._thresholds.append(total - t)
+            rind = randint(seg_start, seg_end)
+            self._thresholds.append(total - rind)
         self._thresholds.sort(reverse=True)
+        
+        print("DEBUG || WHEN BUTTON WILL FLASH")
+        for rind in self._thresholds:
+            mins, sec = divmod(rind, 60)
+            print(f" {mins:02d}:(secs:02d} ({rind}s)")
         
     def reset(self):
         continue
@@ -364,7 +369,8 @@ class Button(PhaseThread):
             return "DEFUSED"
         if self._awaiting:
             return ">> PUSH ME! <<"
-        return "Waiting..."
+        remaining = self._num_events - self._defused_cnt
+        return f"Waiting... ({remaining} presses left)"
 
 
 # the toggle switches phase
