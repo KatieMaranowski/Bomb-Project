@@ -17,9 +17,12 @@ from threading import Thread
 from time import sleep
 import os
 import sys
-from random import randint, random
+from random import random, randint
 
 #########
+#####messages####
+messages = ["Nothing can stop me now!","THIS ISNT EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh]","Didn't anyone ever teach you internet safety?"]
+
 # classes
 #########
 # the LCD display GUI
@@ -89,11 +92,11 @@ class Lcd(Frame):
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
 
         # add read-only text box at bottom-right
-        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=2, width=30, bd=0)
+        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=5, width=30, bd=0,wrap=WORD)
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
 
-        # introduction
+        # introduction sequence
         intro_lines = [
             "Hello Player",
             "I am Virey the Virus, and I   have infected this bomb",
@@ -102,14 +105,21 @@ class Lcd(Frame):
             "Good Luck :)"
         ]
         intro_text = "\n".join(intro_lines)
-        # speak intro, then allow game start
+        # speak intro, then allow game setup
         self.speak(intro_text, self.startGame)
 
         self.pack(fill=BOTH, expand=True)
 
     # called after intro finishes
     def startGame(self):
-        self.setup()
+        sleep(10)
+        global messages
+        index = randint(0,4)
+        message = messages[index]
+        self.speak("\n {}".format(message),self.startGame)
+    
+    def thingy:
+        pass
 
     # sets up the LCD GUI
     def setup(self):
@@ -122,7 +132,7 @@ class Lcd(Frame):
         # the jumper wires status
         self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        #the pushbutton status
+        # the pushbutton status
         self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
         # the toggle switches status
@@ -271,7 +281,7 @@ class Keypad(PhaseThread):
         super().__init__(name, component, target)
         # the default value is an empty string
         self._value = ""
-        self._codes = ["1234", "5678", "9012"]
+        self._codes = ["1111", "1000", "0010"]
         self._current_index = 0
         
     def reset(self):
@@ -312,6 +322,8 @@ class Keypad(PhaseThread):
                     self._failed = True
                     
             sleep(0.1)
+            if self._current_index == 0:
+                
                 
 
     # returns the keypad combination as a string
