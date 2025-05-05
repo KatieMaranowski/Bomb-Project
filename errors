@@ -1,19 +1,12 @@
-Exception in thread Thread-1 (_start_bomb_window):
 Traceback (most recent call last):
-  File "/usr/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
-    self.run()
-  File "/usr/lib/python3.11/threading.py", line 975, in run
-    self._target(*self._args, **self._kwargs)
-  File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 15, in _start_bomb_window
-    gui2 = BombGUI (
-           ^^^^^^^^^
-  File "/home/spartans/Downloads/Bomb-Project-main/bomb_gui.py", line 39, in __init__
-    self.photo_label = ttk.Label(self, image=self.photo_closed)
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/lib/python3.11/tkinter/ttk.py", line 729, in __init__
-    Widget.__init__(self, master, "ttk::label", kw)
-  File "/usr/lib/python3.11/tkinter/ttk.py", line 527, in __init__
-    tkinter.Widget.__init__(self, master, widgetname, kw=kw)
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb.py", line 190, in <module>
+    gui = Lcd(window)
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb_phases.py", line 35, in __init__
+    self.setupBoot()
+  File "/home/spartans/Downloads/Bomb-Project-main/bomb_phases.py", line 54, in setupBoot
+    self._text_box = Text(self, bg = "black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
+  File "/usr/lib/python3.11/tkinter/__init__.py", line 3625, in __init__
+    Widget.__init__(self, master, 'text', cnf, kw)
   File "/usr/lib/python3.11/tkinter/__init__.py", line 2628, in __init__
     self.tk.call(
-_tkinter.TclError: image "pyimage2" doesn't exist
+_tkinter.TclError: unknown option "-text"
