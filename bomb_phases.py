@@ -97,8 +97,8 @@ class Lcd(Frame):
         # introduction sequence
         intro_lines = [
             "Hello Player",
-            "I am Virey the Virus, and I have infected this bomb",
-            "You must complete a series of phases before timer runs out",
+            "I am Virey the Virus, and I   have infected this bomb",
+            "You must complete a series of phases the before timer runs out",
             "Your first hint is 9",
             "Good Luck :)"
         ]
@@ -109,7 +109,7 @@ class Lcd(Frame):
         self.pack(fill=BOTH, expand=True)
 
     # called after intro finishes
-    def startGame(self):s
+    def startGame(self):
         self.setup()
 
     # sets up the LCD GUI
