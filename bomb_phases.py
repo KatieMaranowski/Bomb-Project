@@ -50,7 +50,6 @@ class Lcd(Frame):
         self.setupBoot()
 
     def speak(self, text, callback=None):
-        """Make the virus "talk" by typing out text and animating mouth."""
         self._speak_text = text
         self._speak_index = 0
         self._speak_callback = callback
@@ -94,7 +93,7 @@ class Lcd(Frame):
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
 
-        # introduction sequence
+        # introduction
         intro_lines = [
             "Hello Player",
             "I am Virey the Virus, and I   have infected this bomb",
@@ -103,7 +102,7 @@ class Lcd(Frame):
             "Good Luck :)"
         ]
         intro_text = "\n".join(intro_lines)
-        # speak intro, then allow game setup
+        # speak intro, then allow game start
         self.speak(intro_text, self.startGame)
 
         self.pack(fill=BOTH, expand=True)
@@ -123,7 +122,7 @@ class Lcd(Frame):
         # the jumper wires status
         self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        # the pushbutton status
+        #the pushbutton status
         self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
         # the toggle switches status
