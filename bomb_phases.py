@@ -52,6 +52,12 @@ class Lcd(Frame):
         self.setupBoot()
 
     def speak(self, text, callback=None):
+        
+        self._text_box.config(state=NORMAL)
+        if self._text_box.get("1.0", END).strip(): # i decided to change this to always make a new line in the speaking part itself cause i kept not putting them in the code
+            self._text_box.insert(END, "\n")
+        self._text_box.config(state=DISABLED)
+        
         self._speak_text = text
         self._speak_index = 0
         self._speak_callback = callback
@@ -112,20 +118,23 @@ class Lcd(Frame):
     # called after intro finishes
     def startGame(self):
         self.startup()
-        self._random_messages_delay()
+        self._random_message_delay()
         
+        
+    messages = ["Nothing can stop me now!","THIS ISNT EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh]","Didn't anyone ever teach you internet safety?"]
+        
+
     def _random_message_delay(self):
         delay = randint(15, 30) * 1000 #random time in seconds
         self.after(delay, self._random_message)
     
     def _random_message(self):
         numba = randint(0, len(self.messages) - 1)
-        phrase = self.message[numba]
+        phrase = self.messages[numba]
         
         self.speak(phrase, self._random_message_delay)
         
     
-    messages = ["Nothing can stop me now!","THIS ISNT EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh]","Didn't anyone ever teach you internet safety?"]
         
     # sets up the LCD GUI
     def setup(self):
