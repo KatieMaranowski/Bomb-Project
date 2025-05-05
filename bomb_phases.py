@@ -118,8 +118,6 @@ class Lcd(Frame):
         message = messages[index]
         self.speak("\n {}".format(message),self.startGame)
     
-    def thingy:
-        pass
 
     # sets up the LCD GUI
     def setup(self):
@@ -322,7 +320,6 @@ class Keypad(PhaseThread):
                     self._failed = True
                     
             sleep(0.1)
-            if self._current_index == 0:
                 
                 
 
