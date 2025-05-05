@@ -27,31 +27,28 @@ class Lcd(Frame):
         super().__init__(window, bg="black")
         # make the GUI fullscreen
         window.attributes("-fullscreen", True)
-        # we need to know about the timer (7-segment display) to be able to pause/unpause it
+        # store timer and button for later
         self._timer = None
-        # we need to know about the pushbutton to turn off its LED when the program exits
         self._button = None
         # setup the initial "boot" GUI
         self.setupBoot()
 
-    # sets up the LCD "boot" GUI
+    # sets up the initial splash GUI
     def setupBoot(self):
-        # set column weights
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=2)
-        self.columnconfigure(2, weight=1)
-        # the scrolling informative "boot" text
+        # load and subsample the virus image
         virusopen = PhotoImage(file="virusopen.png")
-        self._virus_image = virusopen.subsample(4,4)
+        self._virus_image = virusopen.subsample(4, 4)
+        # place virus at bottom-left
         self._image_label = Label(self, image=self._virus_image, bg="black")
-        self._image_label.place(relx=0.0, rely=1.0, anchor=)   
-        
-        
+        self._image_label.place(relx=0.0, rely=1.0, anchor=SW)
+
+        # optional scrolling text label
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
-        self.pack(fill=BOTH, expand=True)
-        
-        self._text_box = Text(self, bg = "black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
+
+        # add a read-only text box at bottom-right
+                # create text box without invalid options
+        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=2, width=30, bd=0)
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
         
