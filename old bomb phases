@@ -17,7 +17,6 @@ from threading import Thread
 from time import sleep
 import os
 import sys
-from random import randint, random
 
 #########
 # classes
@@ -27,89 +26,24 @@ class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
         # make the GUI fullscreen
-        window.update_idletasks()
         window.attributes("-fullscreen", True)
-        try:
-            window.state('zoomed')
-        except Exception:
-            pass
-        window.geometry(f"{window.winfo_screenwidth()}x{window.winfo_screenheight()}+0+0")
-        # store timer and button for later
+        # we need to know about the timer (7-segment display) to be able to pause/unpause it
         self._timer = None
+        # we need to know about the pushbutton to turn off its LED when the program exits
         self._button = None
-        # preload both virus images
-        open_img = PhotoImage(file="virusopen.png")
-        closed_img = PhotoImage(file="virusclosed.png")
-        self._virus_open = open_img.subsample(4, 4)
-        self._virus_closed = closed_img.subsample(4, 4)
-        # speaking state
-        self._speak_text = ""
-        self._speak_index = 0
-        self._speak_callback = None
         # setup the initial "boot" GUI
         self.setupBoot()
 
-    def speak(self, text, callback=None):
-        self._speak_text = text
-        self._speak_index = 0
-        self._speak_callback = callback
-        # start typing animation after short delay
-        self.after(500, self._type_speak)
-
-    def _type_speak(self):
-        if self._speak_index < len(self._speak_text):
-            # randomly switch virus image to mimic talking
-            if random() < 0.5:
-                self._image_label.config(image=self._virus_open)
-            else:
-                self._image_label.config(image=self._virus_closed)
-            # insert next character
-            self._text_box.config(state=NORMAL)
-            self._text_box.insert(END, self._speak_text[self._speak_index])
-            self._text_box.see(END)  # auto-scroll as new text appears
-            self._text_box.config(state=DISABLED)
-            self._speak_index += 1
-            # schedule next character
-            self.after(80, self._type_speak)
-        else:
-            # ensure mouth closed at end
-            self._image_label.config(image=self._virus_closed)
-            # callback if provided
-            if self._speak_callback:
-                self._speak_callback()
-
-    # sets up the initial splash GUI
+    # sets up the LCD "boot" GUI
     def setupBoot(self):
-        # place virus at bottom-left
-        self._image_label = Label(self, image=self._virus_closed, bg="black")
-        self._image_label.place(relx=0.1, rely=1.0, anchor=SW)
-
-        # optional scrolling text label
+        # set column weights
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=2)
+        self.columnconfigure(2, weight=1)
+        # the scrolling informative "boot" text
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
-
-        # add read-only text box at bottom-right
-        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=2, width=30, bd=0)
-        self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
-        self._text_box.config(state=DISABLED)
-
-        # introduction
-        intro_lines = [
-            "Hello Player",
-            "I am Virey the Virus, and I   have infected this bomb",
-            "You must complete a series of phases the before timer runs out",
-            "Your first hint is 9",
-            "Good Luck :)"
-        ]
-        intro_text = "\n".join(intro_lines)
-        # speak intro, then allow game start
-        self.speak(intro_text, self.startGame)
-
         self.pack(fill=BOTH, expand=True)
-
-    # called after intro finishes
-    def startGame(self):
-        self.setup()
 
     # sets up the LCD GUI
     def setup(self):
@@ -122,7 +56,7 @@ class Lcd(Frame):
         # the jumper wires status
         self._lwires = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Wires phase: ")
         self._lwires.grid(row=3, column=0, columnspan=3, sticky=W)
-        #the pushbutton status
+        # the pushbutton status
         self._lbutton = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Button phase: ")
         self._lbutton.grid(row=4, column=0, columnspan=3, sticky=W)
         # the toggle switches status
@@ -130,15 +64,14 @@ class Lcd(Frame):
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._lstrikes.place(relx=1.0, rely=0.05, anchor=NE)
-        if SHOW_BUTTONS:
+        self._lstrikes.grid(row=5, column=2, sticky=W)
+        if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
             self._bpause.grid(row=6, column=0, pady=40)
             # the quit button
             self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
             self._bquit.grid(row=6, column=2, pady=40)
-
 
     # lets us pause/unpause the timer (7-segment display)
     def setTimer(self, timer):
@@ -226,7 +159,6 @@ class Timer(PhaseThread):
         self._sec = ""
         # by default, each tick is 1 second
         self._interval = 1
-        self._active = True
 
     # runs the thread
     def run(self):
@@ -276,6 +208,7 @@ class Keypad(PhaseThread):
         
     def reset(self):
         self._value = ""
+        self._current_index = 0
         self._defused = False
         self._failed = False
         
@@ -308,7 +241,7 @@ class Keypad(PhaseThread):
                 if self._value == code:
                     self._current_index += 1
                     self._value = ""
-                elif len(self._value) >= len(code): #only checks if right after 4 digits are put in (removes bruteforce method)
+                elif not code.startswith(self._value):
                     self._failed = True
                     
             sleep(0.1)
@@ -353,92 +286,63 @@ class Wires(PhaseThread):
 
 # the pushbutton phase
 class Button(PhaseThread):
-    def __init__(self, component_state, component_rgb, _old_target, _old_color, timer, name="Button"):
-        super().__init__(name, component_state, None)
-        self._component    = component_state
-        self._rgb          = component_rgb
-        self._timer        = timer
-    
-        # how many flashes & min gap
-        self._num_events   = 3
-        self._min_gap      = 30
-        self._defused_cnt  = 0
-        self._awaiting     = False
-
-        total = timer._value
-        margin = self._min_gap * (self._num_events - 1)
-        segment = (total - margin) // self._num_events
-
-        # pick 3 random trigger–times, sorted high→low
-        self._thresholds = []
-        for i in range(self._num_events):
-            seg_start = i * (segment + self._min_gap)
-            seg_end   = seg_start + segment
-            rind = randint(seg_start, seg_end)
-            self._thresholds.append(total - rind)
-        self._thresholds.sort(reverse=True)
-        
-        print("DEBUG || WHEN BUTTON WILL FLASH")
-        for rind in self._thresholds:
-            mins, sec = divmod(rind, 60)
-            print(f" {mins:02d}:{sec:02d} ({rind}s)")
+    def __init__(self, component_state, component_rgb, target, color, timer, name="Button"):
+        super().__init__(name, component_state, target)
+        # the default value is False/Released
+        self._value = False
+        # has the pushbutton been pressed?
+        self._pressed = False
+        # we need the pushbutton's RGB pins to set its color
+        self._rgb = component_rgb
+        # the pushbutton's randomly selected LED color
+        self._color = color
+        # we need to know about the timer (7-segment display) to be able to determine correct pushbutton releases in some cases
+        self._timer = timer
         
     def reset(self):
-        pass
+        self._value = ""
+        self._current_index = 0
+        self._defused = False
+        self._failed = False
 
+    # runs the thread
     def run(self):
         self._running = True
-        pressed = False
-
-        # start red
-        self._rgb[0].value = False  # red ON
-        self._rgb[1].value = True   # green OFF
-        self._rgb[2].value = True   # blue OFF
-
-        while self._running:
-            # 1) trigger the next green flash if it’s time
-            if self._defused_cnt < self._num_events and not self._awaiting:
-                if self._timer._value <= self._thresholds[self._defused_cnt]:
-                    # flash green
-                    self._rgb[0].value = True   # red OFF
-                    self._rgb[1].value = False  # green ON
-                    self._awaiting = True
-
-            # 2) only listen if toggles → Button *and* we’re awaiting
-            if not (self._active and self._awaiting):
+        # set the RGB LED color
+        self._rgb[0].value = False if self._color == "R" else True
+        self._rgb[1].value = False if self._color == "G" else True
+        self._rgb[2].value = False if self._color == "B" else True
+        while (self._running):
+            if not self._active:
                 sleep(0.1)
                 continue
-
-            # 3) detect press→release
-            current = self._component.value
-            if current and not pressed:
-                # button just depressed
-                pressed = True
-            elif not current and pressed:
-                # button released after a press
-                pressed = False
-                self._defused_cnt += 1
-                self._awaiting = False
-
-                # back to red
-                self._rgb[0].value = False
-                self._rgb[1].value = True
-
-                # if we’ve done all flashes, mark defused
-                if self._defused_cnt >= self._num_events:
-                    self._defused = True
-                    break
-
+            # get the pushbutton's state
+            self._value = self._component.value
+            # it is pressed
+            if (self._value):
+                # note it
+                self._pressed = True
+            # it is released
+            else:
+                # was it previously pressed?
+                if (self._pressed):
+                    # check the release parameters
+                    # for R, nothing else is needed
+                    # for G or B, a specific digit must be in the timer (sec) when released
+                    if (not self._target or self._target in self._timer._sec):
+                        self._defused = True
+                    else:
+                        self._failed = True
+                    # note that the pushbutton was released
+                    self._pressed = False
             sleep(0.1)
 
+    # returns the pushbutton's state as a string
     def __str__(self):
-        if self._defused:
+        if (self._defused):
             return "DEFUSED"
-        if self._awaiting:
-            return ">> PUSH ME! <<"
-        remaining = self._num_events - self._defused_cnt
-        return f"Waiting... ({remaining} presses left)"
-
+        else:
+            return str("Pressed" if self._value else "Released")
 
 # the toggle switches phase
 class Toggles(PhaseThread):
@@ -470,3 +374,4 @@ class Toggles(PhaseThread):
         if (self._defused):
             return "DEFUSED"
         return self._value if self._value is not None else "----"
+

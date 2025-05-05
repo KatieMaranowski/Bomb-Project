@@ -7,7 +7,7 @@
 # constants
 DEBUG = False        # debug mode?
 RPi = True           # is this running on the RPi?
-ANIMATE = True       # animate the LCD text?
+ANIMATE = False       # animate the LCD text?
 SHOW_BUTTONS = False # show the Pause and Quit buttons on the main LCD GUI?
 COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
@@ -68,20 +68,16 @@ if (RPi):
 # 6 pins: 4, 17, 27, 22, 3V3, 3V3
 #         -BUT1- -BUT2-  --BUT3--
 if (RPi):
-    import RPI.GPIO as GPIO
-    
-    #initializing GPIO pins and RBG leds
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup([17, 27, 22], GPIO.OUT)
     # the state pin (state pin is input and pulled down)
     component_button_state = DigitalInOut(board.D4)
     component_button_state.direction = Direction.INPUT
     component_button_state.pull = Pull.DOWN
     # the RGB pins
-    component_button_RGB = [17, 27, 22]
+    component_button_RGB = [DigitalInOut(i) for i in (board.D17, board.D27, board.D22)]
     for pin in component_button_RGB:
         # RGB pins are output
-        GPIO.output(pin, GPIO.HIGH)
+        pin.direction = Direction.OUTPUT
+        pin.value = True
 
 # toggle switches
 # 3x3 pins: 12, 16, 20, 21, 3V3, 3V3, 3V3, 3V3, GND, GND, GND, GND
@@ -220,13 +216,4 @@ if (DEBUG):
     print(f"Button target: {button_target}")
 
 # set the bomb's LCD bootup text
-boot_text = f"Booting...\n\x00\x00"\
-            f"*Kernel v3.1.4-159 loaded.\n"\
-            f"Initializing subsystems...\n\x00"\
-            f"*System model: 102BOMBv4.2\n"\
-            f"*Serial number: {serial}\n"\
-            f"Encrypting keypad...\n\x00"\
-            f"*Keyword: {cipher_keyword}; key: {rot}\n"\
-            f"*{' '.join(ascii_uppercase)}\n"\
-            f"*{' '.join([str(n % 10) for n in range(26)])}\n"\
-            f"Rendering phases...\x00"
+boot_text = ""
