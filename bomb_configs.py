@@ -14,8 +14,8 @@ NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
 toggle_patterns = {
     "Keypad" : "1001", #up, down, down, up
-    "Wires" : "0101",
-    "Button" : "0011",
+    "Wires" : "0101",  #down, up, down, up
+    "Button" : "0011", #down, down, up, up
     }
 
 

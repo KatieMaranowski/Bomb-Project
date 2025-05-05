@@ -1,0 +1,8 @@
+Connor was playing basketball. 1 of his shots went in the hoop. 14 of his shots did not go in the hoop. How many shots were there in total in binary? 1111
+
+
+Your friend has 20 stickers. You check her desk and you see 12 stickers. How many stickers are missing in binary? 1000
+
+I helped my mom with chores yesterday and that took me 120 minutes. How many hours is that in binary? 0010
+
+
