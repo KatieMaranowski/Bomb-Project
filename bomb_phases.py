@@ -140,6 +140,7 @@ class Lcd(Frame):
                 "Hint 1: What year did Columbus sail the ocean blue?"
             )
             self.speak(hint1)
+            self.speak(hint1, self._watch_keypad)
         elif kp and not self._kp_hint2 and kp._current_index >= 1:
             self._kp_hint2 = True
             hint2 = (
@@ -148,6 +149,7 @@ class Lcd(Frame):
                 "I am the very first 4-digit number that reads the same forwards and backwards. What am I?"
             )
             self.speak(hint2)
+            self.speak(hint2, self._watch_keypad)
         elif kp and not self._kp_hint3 and kp._current_index >= 2:
             self._kp_hint3 = True
             hint3 = (
@@ -157,6 +159,7 @@ class Lcd(Frame):
                 "Good luck!"
             )
             self.speak(hint3)
+            self.speak(hint3, self._watch_keypad)
         elif kp and not self._kp_hint4 and kp._defused:
             self._kp_hint4 = True
             hint4 = (
@@ -164,6 +167,7 @@ class Lcd(Frame):
                 "Now, set the toggles to 'E' to move on to the next phase ;)"
             )
             self.speak(hint4)
+            self.speak(hint4, self._watch_keypad)
         else:
             self.after(100, self._watch_keypad)
         
