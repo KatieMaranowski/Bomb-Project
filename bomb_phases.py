@@ -17,6 +17,7 @@ from threading import Thread
 from time import sleep
 import os
 import sys
+from random import randint, random
 
 #########
 # classes
@@ -61,10 +62,17 @@ class Lcd(Frame):
         self._text_box.config(state=DISABLED)
 
         # typing effect with random mouth movements
-        self._typing_text = "Welcome Player, Good Luck"
+        self._intro = [
+            "Hello Player", 
+            "I am Virey the Virus, and I have infected this bomb",
+            "You must complete a series of phases before time runs out",
+            "Your first hint is 9",
+            "Good Luck :)"            
+            ]
+        self._intro_text = "\n".join(self._intro)
         self._typing_index = 0
         def type_char():
-            if self._typing_index < len(self._typing_text):
+            if self._typing_index < len(self._intro_text):
                 # randomly switch virus image to mimic talking
                 if random() < 0.5:
                     self._image_label.config(image=self._virus_open)
@@ -72,7 +80,7 @@ class Lcd(Frame):
                     self._image_label.config(image=self._virus_closed)
                 # insert next character
                 self._text_box.config(state=NORMAL)
-                self._text_box.insert(END, self._typing_text[self._typing_index])
+                self._text_box.insert(END, self._intro_text[self._typing_index])
                 self._typing_index += 1
                 self._text_box.config(state=DISABLED)
                 # schedule next char
@@ -105,7 +113,6 @@ class Lcd(Frame):
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._image_label.place(relx=1.0, rely=0.05, anchor=NE)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
