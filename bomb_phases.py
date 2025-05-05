@@ -32,7 +32,8 @@ class Lcd(Frame):
         
         self._kp_hint1 = False # after first code
         self._kp_hint2 = False # after second
-        self._kp_hint3 = False # after third (defused)
+        self._kp_hint3 = False # after third
+        self._kp_hint4 = False # defused
         
         self.keypad_phase = None
         
@@ -134,7 +135,34 @@ class Lcd(Frame):
         kp = self.keypad_phase
         if kp and not self._kp_hint1 and kp._active:
             self._kp_hint1 = True
-            self.speak("hint1")
+            self.speak["I'll give you some hints cause im such a nice virus",
+                       "Hint 1: What year did Columbus sail the ocean blue?"
+                       ]
+        elif kp and not self._kp_hint2 and kp._current_index >= 1:
+            self._kp_hint2 = True
+            self.speak["Congrats on getting the first one right...",
+                        "I'm very proud of you...",
+                        "Your next hint is going to be a little trickier >:)"
+                        "I am the very first 4 digit number that reads the same fowards and backwards, what am i?"
+                        ]
+        elif kp and not self._kp_hint3 and kp._current_index >= 2:
+            self._kp_hint3 = True
+            self.speak["You're almost done!",
+                       "This next hint is going to be the hardest one yet!",
+                       "I hope you are ready...",
+                       "I'm not stalling you are...",
+                       "Ok, fine the final hint is...",
+                       "What is the product of the number of months in a year multiplied by the number of hours in a week",
+                       "Good luck!"
+                ]
+        elif kp and not self._kp_hint4 and kp._defused:
+            self._kp_hint4 = True
+            self.speak["Oh wow you actually did it",
+                       "I didn't think you had it in you",
+                       "I hope you have some time left...",
+                       "Cause the next phase requires some thinking",
+                       "Go ahead and set the toggles to 5 ;)"
+                       ]
         else:
             self.after(100, self._watch_keypad)
         
@@ -314,7 +342,7 @@ class Keypad(PhaseThread):
         super().__init__(name, component, target)
         # the default value is an empty string
         self._value = ""
-        self._codes = ["1111", "1000", "0010"]
+        self._codes = ["1492", "1001", "2016"]
         self._current_index = 0
         
     def reset(self):
