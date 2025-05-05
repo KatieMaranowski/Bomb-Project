@@ -26,7 +26,13 @@ class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
         # make the GUI fullscreen
+        window.update_idletasks()
         window.attributes("-fullscreen", True)
+        try:
+            window.state('zoomed')
+        except Exception:
+            pass
+        window.geometry(f"{window.winfo_screenwidth()}x{window.winfo_screenheight()}+0+0")
         # store timer and button for later
         self._timer = None
         self._button = None
