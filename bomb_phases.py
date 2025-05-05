@@ -109,12 +109,7 @@ class Lcd(Frame):
         self.pack(fill=BOTH, expand=True)
 
     # called after intro finishes
-    def startGame(self):
-        # clear boot widgets
-        self._image_label.place_forget()
-        self._text_box.destroy()
-        self._lscroll.destroy()
-        # launch main GUI
+    def startGame(self):s
         self.setup()
 
     # sets up the LCD GUI
