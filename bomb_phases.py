@@ -271,7 +271,7 @@ class Keypad(PhaseThread):
         super().__init__(name, component, target)
         # the default value is an empty string
         self._value = ""
-        self._codes = ["1234", "5678", "9012"]
+        self._codes = ["1111", "1000", "0010"]
         self._current_index = 0
         
     def reset(self):
