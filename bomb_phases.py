@@ -44,12 +44,31 @@ class Lcd(Frame):
         virusopen = PhotoImage(file="virusopen.png")
         self._virus_image = virusopen.subsample(4,4)
         self._image_label = Label(self, image=self._virus_image, bg="black")
-        self._image_label.place(relx=1.0, rely=1.0, anchor=SE)   
+        self._image_label.place(relx=0.0, rely=1.0, anchor=)   
         
         
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
         self.pack(fill=BOTH, expand=True)
+        
+        self._text_box = Text(self, bg = "black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
+        self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
+        self._text_box.config(state=DISABLED)
+        
+        self._typing_text = "Welcome Player, Good Luck"
+        self._typing_index = 0
+        def type_char():
+            if self._typing_index < len(self._typing_text):
+                self._text_box.config(state=NORMAL)
+                self._text_box.insert(END, self._typing_text[self._typing_index])
+                self._typing_index += 1
+                self._text_box.config(state=DISABLED)
+                # schedule next character
+                self.after(100, type_char)
+        self.after(500, type_char)
+
+        self.pack(fill=BOTH, expand=True)
+
 
     # sets up the LCD GUI
     def setup(self):
@@ -70,7 +89,7 @@ class Lcd(Frame):
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._lstrikes.grid(row=5, column=2, sticky=W)
+        self._lstrikes.grid(row=1, column=2, sticky=W)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
