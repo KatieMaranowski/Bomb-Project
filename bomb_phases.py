@@ -51,10 +51,6 @@ class Lcd(Frame):
 
     def speak(self, text, callback=None):
         """Make the virus "talk" by typing out text and animating mouth."""
-        # clear any existing text
-        self._text_box.config(state=NORMAL)
-        self._text_box.delete('1.0', END)
-        self._text_box.config(state=DISABLED)
         self._speak_text = text
         self._speak_index = 0
         self._speak_callback = callback
