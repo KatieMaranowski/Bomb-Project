@@ -50,7 +50,7 @@ class Lcd(Frame):
         self._virus_closed = closed_img.subsample(4, 4)
         # start with closed
         self._image_label = Label(self, image=self._virus_closed, bg="black")
-        self._image_label.place(relx=0.0, rely=1.0, anchor=SW)
+        self._image_label.place(relx=0.2, rely=1.0, anchor=SW)
 
         # optional scrolling text label
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
@@ -64,8 +64,8 @@ class Lcd(Frame):
         # typing effect with random mouth movements
         self._intro = [
             "Hello Player", 
-            "I am Virey the Virus, and I have infected this bomb",
-            "You must complete a series of phases before time runs out",
+            "I am Virey the Virus, and I   have infected this bomb",
+            "You must complete a series of phases before timer runs out",
             "Your first hint is 9",
             "Good Luck :)"            
             ]
@@ -81,6 +81,7 @@ class Lcd(Frame):
                 # insert next character
                 self._text_box.config(state=NORMAL)
                 self._text_box.insert(END, self._intro_text[self._typing_index])
+                self._text_box.see(END)
                 self._typing_index += 1
                 self._text_box.config(state=DISABLED)
                 # schedule next char
@@ -113,6 +114,7 @@ class Lcd(Frame):
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
+        self._image_label.place(relx=1.0, rely=0.05, anchor=NE)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
