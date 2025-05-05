@@ -28,6 +28,13 @@ from random import random, randint
 class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
+        #Hint checks
+        self._hint1 = False # after first code
+        self._hint2 = False # after second
+        self._hint3 = False # after third (defused)
+        
+        self.keypad_phase = None
+        
         # make the GUI fullscreen
         window.update_idletasks()
         window.attributes("-fullscreen", True)
@@ -104,9 +111,10 @@ class Lcd(Frame):
         # introduction sequence
         intro_lines = [
             "Hello Player",
-            "I am Virey the Virus, and I   have infected this bomb",
-            "You must complete a series of phases the before timer runs out",
-            "Your first hint is 9",
+            "I am Virey the Virus, and I have infected this bomb",
+            "You must complete a series of phases before",
+            "the timer runs out",
+            "Your first hint is to set the toggles to 9 ;)",
             "Good Luck :)"
         ]
         intro_text = "\n".join(intro_lines)
@@ -117,8 +125,18 @@ class Lcd(Frame):
 
     # called after intro finishes
     def startGame(self):
-        self.startup()
+        self.setup()
         self._random_message_delay()
+        self._watch_keypad()
+    
+    def _watch_keypad(self):
+        kp = self.keypad_phase
+        if kp:
+            if not self._hint1 and kp._current_index >=1:
+                self._hint1 = True
+                self.speak("hint1")
+        
+        self.after(100, self._watch_keypad)
         
         
     messages = ["Nothing can stop me now!","THIS ISNT EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh]","Didn't anyone ever teach you internet safety?"]

@@ -44,6 +44,7 @@ def setup_phases():
     gui.setTimer(timer)
     # setup the keypad thread
     keypad = Keypad(component_keypad, keypad_target)
+    gui.keypad_phase = keypad
     # setup the jumper wires thread
     wires = Wires(component_wires, wires_target)
     # setup the pushbutton thread
@@ -57,7 +58,7 @@ def setup_phases():
         "Button": button,
     }
     
-    toggles = Toggles(component_toggles, toggles_target, phase_map)    
+    toggles = Toggles(component_toggles, toggles_target, phase_map)
     # start the phase threads
     timer.start()
     keypad.start()
