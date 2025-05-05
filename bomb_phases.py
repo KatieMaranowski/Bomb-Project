@@ -116,7 +116,7 @@ class Lcd(Frame):
             "I am Virey the Virus, and I have infected this bomb",
             "You must complete a series of phases before",
             "the timer runs out",
-            "Your first hint is to set the toggles to 9 ;)",
+            "Your first hint is to set the toggles to '9' ;)",
             "Good Luck :)"
         ]
         intro_text = "\n".join(intro_lines)
@@ -135,34 +135,35 @@ class Lcd(Frame):
         kp = self.keypad_phase
         if kp and not self._kp_hint1 and kp._active:
             self._kp_hint1 = True
-            self.speak["I'll give you some hints cause im such a nice virus",
-                       "Hint 1: What year did Columbus sail the ocean blue?"
-                       ]
+            hint1 = (
+                "I'll give you some hints 'cause I'm such a nice virus.\n"
+                "Hint 1: What year did Columbus sail the ocean blue?"
+            )
+            self.speak(hint1)
         elif kp and not self._kp_hint2 and kp._current_index >= 1:
             self._kp_hint2 = True
-            self.speak["Congrats on getting the first one right...",
-                        "I'm very proud of you...",
-                        "Your next hint is going to be a little trickier >:)"
-                        "I am the very first 4 digit number that reads the same fowards and backwards, what am i?"
-                        ]
+            hint2 = (
+                "Congrats on the first one!\n"
+                "Next hint (a bit trickier):\n"
+                "I am the very first 4-digit number that reads the same forwards and backwards. What am I?"
+            )
+            self.speak(hint2)
         elif kp and not self._kp_hint3 and kp._current_index >= 2:
             self._kp_hint3 = True
-            self.speak["You're almost done!",
-                       "This next hint is going to be the hardest one yet!",
-                       "I hope you are ready...",
-                       "I'm not stalling you are...",
-                       "Ok, fine the final hint is...",
-                       "What is the product of the number of months in a year multiplied by the number of hours in a week",
-                       "Good luck!"
-                ]
+            hint3 = (
+                "You're almost done!\n"
+                "Final hint:\n"
+                "What is the product of the number of months in a year multiplied by the number of hours in a week?\n"
+                "Good luck!"
+            )
+            self.speak(hint3)
         elif kp and not self._kp_hint4 and kp._defused:
             self._kp_hint4 = True
-            self.speak["Oh wow you actually did it",
-                       "I didn't think you had it in you",
-                       "I hope you have some time left...",
-                       "Cause the next phase requires some thinking",
-                       "Go ahead and set the toggles to 5 ;)"
-                       ]
+            hint4 = (
+                "Oh wow, you actually did it!\n"
+                "Now, set the toggles to 'E' to move on to the next phase ;)"
+            )
+            self.speak(hint4)
         else:
             self.after(100, self._watch_keypad)
         
