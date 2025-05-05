@@ -37,20 +37,57 @@ class Lcd(Frame):
         # store timer and button for later
         self._timer = None
         self._button = None
-        # setup the initial "boot" GUI
-        self.setupBoot()
-
-    # sets up the initial splash GUI
-    def setupBoot(self):
         # preload both virus images
         open_img = PhotoImage(file="virusopen.png")
         closed_img = PhotoImage(file="virusclosed.png")
-        # subsample both
         self._virus_open = open_img.subsample(4, 4)
         self._virus_closed = closed_img.subsample(4, 4)
-        # start with closed
+        # speaking state
+        self._speak_text = ""
+        self._speak_index = 0
+        self._speak_callback = None
+        # setup the initial "boot" GUI
+        self.setupBoot()
+
+    def speak(self, text, callback=None):
+        """Make the virus "talk" by typing out text and animating mouth."""
+        # clear any existing text
+        self._text_box.config(state=NORMAL)
+        self._text_box.delete('1.0', END)
+        self._text_box.config(state=DISABLED)
+        self._speak_text = text
+        self._speak_index = 0
+        self._speak_callback = callback
+        # start typing animation after short delay
+        self.after(500, self._type_speak)
+
+    def _type_speak(self):
+        if self._speak_index < len(self._speak_text):
+            # randomly switch virus image to mimic talking
+            if random() < 0.5:
+                self._image_label.config(image=self._virus_open)
+            else:
+                self._image_label.config(image=self._virus_closed)
+            # insert next character
+            self._text_box.config(state=NORMAL)
+            self._text_box.insert(END, self._speak_text[self._speak_index])
+            self._text_box.see(END)  # auto-scroll as new text appears
+            self._text_box.config(state=DISABLED)
+            self._speak_index += 1
+            # schedule next character
+            self.after(80, self._type_speak)
+        else:
+            # ensure mouth closed at end
+            self._image_label.config(image=self._virus_closed)
+            # callback if provided
+            if self._speak_callback:
+                self._speak_callback()
+
+    # sets up the initial splash GUI
+    def setupBoot(self):
+        # place virus at bottom-left
         self._image_label = Label(self, image=self._virus_closed, bg="black")
-        self._image_label.place(relx=0.2, rely=1.0, anchor=SW)
+        self._image_label.place(relx=0.1, rely=1.0, anchor=SW)
 
         # optional scrolling text label
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
@@ -61,39 +98,28 @@ class Lcd(Frame):
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
 
-        # typing effect with random mouth movements
-        self._intro = [
-            "Hello Player", 
-            "I am Virey the Virus, and I   have infected this bomb",
+        # introduction sequence
+        intro_lines = [
+            "Hello Player",
+            "I am Virey the Virus, and I have infected this bomb",
             "You must complete a series of phases before timer runs out",
             "Your first hint is 9",
-            "Good Luck :)"            
-            ]
-        self._intro_text = "\n".join(self._intro)
-        self._typing_index = 0
-        def type_char():
-            if self._typing_index < len(self._intro_text):
-                # randomly switch virus image to mimic talking
-                if random() < 0.5:
-                    self._image_label.config(image=self._virus_open)
-                else:
-                    self._image_label.config(image=self._virus_closed)
-                # insert next character
-                self._text_box.config(state=NORMAL)
-                self._text_box.insert(END, self._intro_text[self._typing_index])
-                self._text_box.see(END)
-                self._typing_index += 1
-                self._text_box.config(state=DISABLED)
-                # schedule next char
-                self.after(100, type_char)
-            else:
-                # ensure mouth closed at end
-                self._image_label.config(image=self._virus_closed)
-        # start after short delay
-        self.after(500, type_char)
+            "Good Luck :)"
+        ]
+        intro_text = "\n".join(intro_lines)
+        # speak intro, then allow game setup
+        self.speak(intro_text, self.startGame)
 
         self.pack(fill=BOTH, expand=True)
 
+    # called after intro finishes
+    def startGame(self):
+        # clear boot widgets
+        self._image_label.place_forget()
+        self._text_box.destroy()
+        self._lscroll.destroy()
+        # launch main GUI
+        self.setup()
 
     # sets up the LCD GUI
     def setup(self):
@@ -115,13 +141,14 @@ class Lcd(Frame):
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
         self._lstrikes.place(relx=1.0, rely=0.05, anchor=NE)
-        if (SHOW_BUTTONS):
+        if SHOW_BUTTONS:
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
             self._bpause.grid(row=6, column=0, pady=40)
             # the quit button
             self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
             self._bquit.grid(row=6, column=2, pady=40)
+
 
     # lets us pause/unpause the timer (7-segment display)
     def setTimer(self, timer):
