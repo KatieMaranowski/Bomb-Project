@@ -41,33 +41,46 @@ class Lcd(Frame):
 
     # sets up the initial splash GUI
     def setupBoot(self):
-        # load and subsample the virus image
-        virusopen = PhotoImage(file="virusopen.png")
-        self._virus_image = virusopen.subsample(4, 4)
-        # place virus at bottom-left
-        self._image_label = Label(self, image=self._virus_image, bg="black")
+        # preload both virus images
+        open_img = PhotoImage(file="virusopen.png")
+        closed_img = PhotoImage(file="virusclosed.png")
+        # subsample both
+        self._virus_open = open_img.subsample(4, 4)
+        self._virus_closed = closed_img.subsample(4, 4)
+        # start with closed
+        self._image_label = Label(self, image=self._virus_closed, bg="black")
         self._image_label.place(relx=0.0, rely=1.0, anchor=SW)
 
         # optional scrolling text label
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
 
-        # add a read-only text box at bottom-right
-                # create text box without invalid options
+        # add read-only text box at bottom-right
         self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=2, width=30, bd=0)
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
-        
+
+        # typing effect with random mouth movements
         self._typing_text = "Welcome Player, Good Luck"
         self._typing_index = 0
         def type_char():
             if self._typing_index < len(self._typing_text):
+                # randomly switch virus image to mimic talking
+                if random() < 0.5:
+                    self._image_label.config(image=self._virus_open)
+                else:
+                    self._image_label.config(image=self._virus_closed)
+                # insert next character
                 self._text_box.config(state=NORMAL)
                 self._text_box.insert(END, self._typing_text[self._typing_index])
                 self._typing_index += 1
                 self._text_box.config(state=DISABLED)
-                # schedule next character
+                # schedule next char
                 self.after(100, type_char)
+            else:
+                # ensure mouth closed at end
+                self._image_label.config(image=self._virus_closed)
+        # start after short delay
         self.after(500, type_char)
 
         self.pack(fill=BOTH, expand=True)
@@ -92,7 +105,7 @@ class Lcd(Frame):
         self._ltoggles.grid(row=5, column=0, columnspan=2, sticky=W)
         # the strikes left
         self._lstrikes = Label(self, bg="black", fg="#00ff00", font=("Courier New", 18), text="Strikes left: ")
-        self._lstrikes.grid(row=1, column=2, sticky=W)
+        self._image_label.place(relx=1.0, rely=0.05, anchor=NE)
         if (SHOW_BUTTONS):
             # the pause button (pauses the timer)
             self._bpause = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Pause", anchor=CENTER, command=self.pause)
