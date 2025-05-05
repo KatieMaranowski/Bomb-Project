@@ -29,9 +29,10 @@ class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
         #Hint checks
-        self._hint1 = False # after first code
-        self._hint2 = False # after second
-        self._hint3 = False # after third (defused)
+        
+        self._kp_hint1 = False # after first code
+        self._kp_hint2 = False # after second
+        self._kp_hint3 = False # after third (defused)
         
         self.keypad_phase = None
         
@@ -131,12 +132,11 @@ class Lcd(Frame):
     
     def _watch_keypad(self):
         kp = self.keypad_phase
-        if kp:
-            if not self._hint1 and kp._current_index >=1:
-                self._hint1 = True
-                self.speak("hint1")
-        
-        self.after(100, self._watch_keypad)
+        if kp and not self._kp_hint1 and kp._active:
+            self._kp_hint1 = True
+            self.speak("hint1")
+        else:
+            self.after(100, self._watch_keypad)
         
         
     messages = ["Nothing can stop me now!","THIS ISNT EVEN MY FINAL FORM!","Nice try!","[from evil_libraries import maniacal_laugh]","Didn't anyone ever teach you internet safety?"]
