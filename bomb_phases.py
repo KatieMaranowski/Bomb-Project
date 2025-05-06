@@ -435,7 +435,7 @@ class Wires(PhaseThread):
 
 # the pushbutton phase
 class Button(PhaseThread):
-    def __init__(self, component_state, component_rgb, _old_target, _old_color, timer, name="Button"):
+    def __init__(self, component_state, component_rgb, _old_target, _old_color, timer, lcd, name="Button"):
         super().__init__(name, component_state, None)
         self._component = component_state
         self._rgb = component_rgb
@@ -443,7 +443,9 @@ class Button(PhaseThread):
         self._lcd = lcd
         
         self._normal_interval = timer._interval
-    
+        
+        self._count = 0
+        
         # how many flashes & min gap
         self._num_events   = 3
         self._min_gap      = 30
@@ -487,7 +489,11 @@ class Button(PhaseThread):
                     # flash green
                     self._rgb[0].value = True   # red OFF
                     self._rgb[1].value = False # green ON
-                    self._lcd.speak("If the button is green, the timer is ticking 3 times as fast!!!")
+                    if self._count == 0:
+                        self._lcd.speak("If the button is green, the timer is ticking 3 times as fast!!!\n"
+                                        "Try setting the toggles to 3 in order to slow down the timer!"
+                                        )
+                        self._count += 1
                     self._timer._interval = self._normal_interval / 3
                     self._awaiting = True
 
