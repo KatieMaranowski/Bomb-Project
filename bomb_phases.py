@@ -485,10 +485,18 @@ class Button(PhaseThread):
         for i in range(self._num_events):
             seg_start = i * (segment + self._min_gap)
             seg_end   = seg_start + segment
+            
+            if i == self._num_events - 1:
+                max_rind = total - 30
+                
+                seg_start = min(seg_start, max_rind)
+                seg_end = min(seg_end, max_rind)
+                
             rind = randint(seg_start, seg_end)
             self._thresholds.append(total - rind)
+            
         self._thresholds.sort(reverse=True)
-        
+            
         print("DEBUG || WHEN BUTTON WILL FLASH")
         for rind in self._thresholds:
             mins, sec = divmod(rind, 60)
