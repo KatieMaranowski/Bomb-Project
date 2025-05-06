@@ -411,7 +411,6 @@ class Wires(PhaseThread):
         super().__init__(name, component, target)
         
     def reset(self):
-        self._value = ""
         self._current_index = 0
         self._defused = False
         self._failed = False
@@ -423,15 +422,20 @@ class Wires(PhaseThread):
             if not self._active:
                 sleep(0.1)
                 continue
-        pass
+            intact = sum(1 for i in self._component if i.value)
+            
+            if intact == 0:
+                self._defused = True
+                break
+            self._value = intact
+            sleep(0.1)
 
     # returns the jumper wires state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # TODO
-            pass
+            return f"{self._value} wires left"
 
 # the pushbutton phase
 class Button(PhaseThread):
