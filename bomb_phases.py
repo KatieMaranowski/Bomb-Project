@@ -28,6 +28,8 @@ from random import random, randint
 class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
+        
+        self._speaking = False # creates a queue for phrases incase a random one fires off when something important is being said
         #Hint checks
         
         self._kp_hint1 = False # after first code
@@ -61,6 +63,7 @@ class Lcd(Frame):
         self.setupBoot()
 
     def speak(self, text, callback=None):
+        self._speaking = True
         
         self._text_box.config(state=NORMAL)
         if self._text_box.get("1.0", END).strip(): # i decided to change this to always make a new line in the speaking part itself cause i kept not putting them in the code
@@ -91,6 +94,7 @@ class Lcd(Frame):
         else:
             # ensure mouth closed at end
             self._image_label.config(image=self._virus_closed)
+            self._speaking = False
             # callback if provided
             if self._speak_callback:
                 self._speak_callback()
@@ -173,8 +177,13 @@ class Lcd(Frame):
 
     def _random_message_delay(self):
         delay = randint(15, 30) * 1000 #random time in seconds
-        self.after(delay, self._random_message)
-    
+        self.after(delay, self._try_random_message)
+        
+    def _try_random_message(self):
+        if self._speaking:
+            self.after(1000, self._try_random_message)
+        else:
+            self._random_message()
     def _random_message(self):
         numba = randint(0, len(self.messages) - 1)
         phrase = self.messages[numba]
