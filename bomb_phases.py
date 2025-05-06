@@ -37,6 +37,9 @@ class Lcd(Frame):
         self._kp_hint3 = False # after third
         self._kp_hint4 = False # defused
         
+        self._wire_hint = False
+        
+        self.wire_phase = None
         self.keypad_phase = None
         
         # make the GUI fullscreen
@@ -134,6 +137,16 @@ class Lcd(Frame):
         self.setup()
         self._random_message_delay()
         self._watch_keypad()
+        self._watch_wires()
+        
+        
+    def _watch_wires(self):
+        wp = self.wires_phase
+        if wp and not self._wire_hint and wp._active:
+            self._wire_hint = True
+            self.speak("The only way to beat the wire phase is to pull all of the wires out")
+        else:
+            self.after(100, self._watch_wires)
     
     def _watch_keypad(self):
         kp = self.keypad_phase
@@ -415,6 +428,7 @@ class Wires(PhaseThread):
         self._defused = False
         self._failed = False
 
+
     # runs the thread
     def run(self):
         self._running = True
@@ -435,7 +449,7 @@ class Wires(PhaseThread):
         if (self._defused):
             return "DEFUSED"
         else:
-            return f"{self._value} wires left"
+            return "NOT DEFUSED"
 
 # the pushbutton phase
 class Button(PhaseThread):
