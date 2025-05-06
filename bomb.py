@@ -146,16 +146,14 @@ def check_phases():
         # stop checking phases
         return
 
-    # the bomb has been successfully defused!
-    if (active_phases == 0):
-        # turn off the bomb and render the conclusion GUI
-        turn_off()
-        gui.after(100, gui.conclusion, True)
-        # stop checking phases
-        return
 
     # check the phases again after a slight delay
     gui.after(100, check_phases)
+    
+    if active_phases == 1:
+        turn_off()
+        gui.after(100, gui.win)
+        return
 
 # handles a strike
 def strike():

@@ -64,6 +64,12 @@ class Lcd(Frame):
         self._speak_callback = None
         # setup the initial "boot" GUI
         self.setupBoot()
+        
+    def win(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+        win_lbl = Label(self, text="!!!YOU WIN!!!", fg="red", bg="black", font=("Courier New", 48, "bold"))
+        win_lbl.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def speak(self, text, callback=None):
         self._speaking = True
