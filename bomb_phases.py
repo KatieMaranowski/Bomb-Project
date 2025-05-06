@@ -440,6 +440,8 @@ class Button(PhaseThread):
         self._component    = component_state
         self._rgb          = component_rgb
         self._timer        = timer
+        
+        self._normal_interval = timer._interval
     
         # how many flashes & min gap
         self._num_events   = 3
@@ -483,7 +485,8 @@ class Button(PhaseThread):
                 if self._timer._value <= self._thresholds[self._defused_cnt]:
                     # flash green
                     self._rgb[0].value = True   # red OFF
-                    self._rgb[1].value = False  # green ON
+                    self._rgb[1].value = False # green ON
+                    self._timer._interval = self._normal_interval / 3
                     self._awaiting = True
 
             # 2) only listen if toggles → Button *and* we’re awaiting
@@ -505,6 +508,7 @@ class Button(PhaseThread):
                 # back to red
                 self._rgb[0].value = False
                 self._rgb[1].value = True
+                self._timer._interval = self._normal_interval
 
                 # if we’ve done all flashes, mark defused
                 if self._defused_cnt >= self._num_events:
