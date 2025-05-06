@@ -103,14 +103,14 @@ class Lcd(Frame):
     def setupBoot(self):
         # place virus at bottom-left
         self._image_label = Label(self, image=self._virus_closed, bg="black")
-        self._image_label.place(relx=0.1, rely=1.0, anchor=SW)
+        self._image_label.place(relx=0.05, rely=1.0, anchor=SW)
 
         # optional scrolling text label
         self._lscroll = Label(self, bg="black", fg="white", font=("Courier New", 14), text="", justify=LEFT)
         self._lscroll.grid(row=0, column=0, columnspan=3, sticky=W)
 
         # add read-only text box at bottom-right
-        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=5, width=30, bd=0,wrap=WORD)
+        self._text_box = Text(self, bg="black", fg="white", font=("Courier New", 14), height=10, width=40, bd=0,wrap=WORD)
         self._text_box.place(relx=1.0, rely=1.0, anchor=SE)
         self._text_box.config(state=DISABLED)
 
@@ -437,9 +437,10 @@ class Wires(PhaseThread):
 class Button(PhaseThread):
     def __init__(self, component_state, component_rgb, _old_target, _old_color, timer, name="Button"):
         super().__init__(name, component_state, None)
-        self._component    = component_state
-        self._rgb          = component_rgb
-        self._timer        = timer
+        self._component = component_state
+        self._rgb = component_rgb
+        self._timer = timer
+        self._lcd = lcd
         
         self._normal_interval = timer._interval
     
@@ -486,6 +487,7 @@ class Button(PhaseThread):
                     # flash green
                     self._rgb[0].value = True   # red OFF
                     self._rgb[1].value = False # green ON
+                    self._lcd.speak("If the button is green, the timer is ticking 3 times as fast!!!")
                     self._timer._interval = self._normal_interval / 3
                     self._awaiting = True
 
@@ -523,7 +525,7 @@ class Button(PhaseThread):
         if self._awaiting:
             return ">> PUSH ME! <<"
         remaining = self._num_events - self._defused_cnt
-        return f"Waiting... ({remaining} presse(s) left)"
+        return f"Waiting... ({remaining} press(es) left)"
 
 
 # the toggle switches phase
