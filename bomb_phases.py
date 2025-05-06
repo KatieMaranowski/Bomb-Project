@@ -519,7 +519,7 @@ class Button(PhaseThread):
         if self._awaiting:
             return ">> PUSH ME! <<"
         remaining = self._num_events - self._defused_cnt
-        return f"Waiting... ({remaining} presses left)"
+        return f"Waiting... ({remaining} presse(s) left)"
 
 
 # the toggle switches phase
