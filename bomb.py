@@ -49,7 +49,8 @@ def setup_phases():
     wires = Wires(component_wires, wires_target)
     gui.wires_phase = wires
     # setup the pushbutton thread
-    button = Button(component_button_state, component_button_RGB, button_target, button_color, timer, gui) 
+    button = Button(component_button_state, component_button_RGB, button_target, button_color, timer, gui)
+    gui.button_phase = button
     # bind the pushbutton to the LCD GUI so that its LED can be turned off when we quit
     gui.setButton(button)
     # setup the toggle switches thread
@@ -60,6 +61,7 @@ def setup_phases():
     }
     
     toggles = Toggles(component_toggles, toggles_target, phase_map)
+    gui.toggles_phase = toggles
     # start the phase threads
     timer.start()
     keypad.start()
