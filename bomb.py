@@ -69,8 +69,7 @@ def setup_phases():
     button.start()
     toggles.start()
     
-    gui.after(15000, button.start)
-
+    
 # checks the phase threads
 def check_phases():
     global active_phases

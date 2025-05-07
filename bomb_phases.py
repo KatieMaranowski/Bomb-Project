@@ -112,6 +112,13 @@ class Lcd(Frame):
             # callback if provided
             if self._speak_callback:
                 self._speak_callback()
+                
+                
+    def queue_speak(self, text, callback=None):
+        if self._speaking:
+            self.after(500, lambda: self.queue_speak(text, callback))
+        else:
+            self.speak(text, callback)
 
     # sets up the initial splash GUI
     def setupBoot(self):
@@ -527,7 +534,7 @@ class Button(PhaseThread):
                     self._rgb[0].value = True   # red OFF
                     self._rgb[1].value = False # green ON
                     if self._count == 0:
-                        self._lcd.speak("If the button is green, the timer is ticking 3 times as fast!!!\n"
+                        self._lcd.queue_speak("If the button is green, the timer is ticking 3 times as fast!!!\n"
                                         "Try setting the toggles to 3 in order to slow down the timer!"
                                         )
                         self._count += 1
