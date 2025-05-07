@@ -267,27 +267,18 @@ class Lcd(Frame):
 
     # setup the conclusion GUI (explosion/defusion)
     def conclusion(self, success=False):
-        # destroy/clear widgets that are no longer needed
-        self._lscroll["text"] = ""
-        self._ltimer.destroy()
-        self._lkeypad.destroy()
-        self._lwires.destroy()
-        self._lbutton.destroy()
-        self._ltoggles.destroy()
-        self._lstrikes.destroy()
-        if (SHOW_BUTTONS):
-            self._bpause.destroy()
-            self._bquit.destroy()
+        for widget in self.winfo_children():
+            widget.destroy()
+            
+        self._bretry = tkinter.Button(self, bg='red', fg='white', font=("Courier New", 18), text='Retry', command=self.retry)
+        self._bretry.place(relx=0.5, rely=0.55, anchor = CENTER)
+        
+        self._bquit = tkinter.Button(self, bg='red', fg='white', font=("Courier New", 18), text='Quit', command=self.quit)
+        self._bquit.place(relx=0.5, rely=0.45, anchor = CENTER)
 
-        # reconfigure the GUI
-        # the retry button
-        self._bretry = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Retry", anchor=CENTER, command=self.retry)
-        self._bretry.grid(row=1, column=0, pady=40)
-        # the quit button
-        self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
-        self._bquit.grid(row=1, column=2, pady=40)
 
-    # re-attempts the bomb (after an explosion or a successful defusion)
+
+        # re-attempts the bomb (after an explosion or a successful defusion)
     def retry(self):
         # re-launch the program (and exit this one)
         os.execv(sys.executable, ["python3"] + [sys.argv[0]])
