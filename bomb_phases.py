@@ -148,42 +148,7 @@ class Lcd(Frame):
         self.setup()
         self._random_message_delay()
         self._watch_keypad()
-        self._watch_wires()
-        self.after(randint(15, 20)*1000, self._show_popup)
-        
-    def _show_popup(self):
-        for i in (self.keypad_phase, self.wires_phase, self.button_phase, self.toggles_phase):
-            if i and i is not self._keypad_phase:
-                i._active = False
-        
-        self._popup_window = Toplevel(self)
-        self._popup_window.attributes("-fullscreen", True)
-        popup_img = PhotoImage(file="popup.png")
-        img = Label(self._popup_window, image=img)
-        label.image = img
-        label.pack(fill="both", expand=True)
-        
-        from bomb_phases import Keypad
-        self._popup_keypad = Keypad(component_keypad, None, name="Popup")
-        self._popup_keypad._codes = [self.popup_code]
-        self._popup_keypad._current_index = 0
-        self._popup_keypad._defused = False
-        self._popup_keypad._failed = False
-        self._popup_keypad._active = True
-        self._popup_keypad._running = True
-        
-        self._watch_popup()
-        
-    def _watch_popup(self):
-        if self._popup_keypad._defused:
-            self._popup_keypad._running = False
-            self._popup_window.destroy()
-            
-            for i in (self.keypad_phase, self.wires_phase, self.button_phase, self.toggles_phase):
-                if i:
-                    i._active = True
-                    
-            
+        self._watch_wires()     
 
         
     def _watch_wires(self):
